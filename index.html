@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status Effect Calculator</title>
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; user-select: none; -webkit-user-select: none; }
+        .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        h2 { text-align: center; color: #333; margin-bottom: 1.5rem; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: bold; color: #555; }
+        select, input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
+        .result-box { margin-top: 1.5rem; padding: 1rem; background: #e9f7ef; border-radius: 8px; border: 1px solid #c3e6cb; }
+        .result-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+        .result-row:last-child { margin-bottom: 0; }
+        .result-label { font-weight: bold; color: #155724; }
+        .result-value { font-weight: bold; color: #28a745; font-size: 1.2rem; }
+        .stat-hint { font-size: 0.8rem; color: #888; margin-top: 2px; }
+        .security-notice { font-size: 0.7rem; color: #ccc; text-align: center; margin-top: 2rem; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body oncontextmenu="return false;">
+    <div class="container">
+        <h2>เครื่องคำนวณโอกาสสถานะ</h2>
+        
+        <div class="form-group">
+            <label>[1] เลือกสถานะ (Status)</label>
+            <select id="i1"></select>
+        </div>
+
+        <div class="form-group">
+            <label>[2] ค่า Stat ฝั่งโจมตี <span id="hint2" class="stat-hint"></span></label>
+            <input type="number" id="i2" placeholder="ระบุค่า Stat">
+        </div>
+
+        <div class="form-group">
+            <label>[3] Status Atk %</label>
+            <input type="number" id="i3" value="0">
+        </div>
+
+        <div class="form-group">
+            <label>[4] CC Atk %</label>
+            <input type="number" id="i4" value="0">
+        </div>
+
+        <div class="form-group">
+            <label>[5] ค่า Stat ฝั่งป้องกัน (โอกาส) <span id="hint5" class="stat-hint"></span></label>
+            <input type="number" id="i5" placeholder="ระบุค่ารวม">
+        </div>
+
+        <div class="form-group">
+            <label>[6] ค่า Stat ฝั่งป้องกัน (เวลา) <span id="hint6" class="stat-hint"></span></label>
+            <input type="number" id="i6" placeholder="ระบุค่ารวม">
+        </div>
+
+        <div class="form-group">
+            <label>[7] Resist %</label>
+            <input type="number" id="i7" value="0">
+        </div>
+
+        <div class="form-group">
+            <label>[8] CC Res %</label>
+            <input type="number" id="i8" value="0">
+        </div>
+
+        <div class="result-box">
+            <div class="result-row">
+                <span class="result-label">โอกาสติด:</span>
+                <span class="result-value" id="r_chance">0.00%</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">ระยะเวลา:</span>
+                <span class="result-value" id="r_dur">0.00%</span>
+            </div>
+        </div>
+        
+        <div class="security-notice">Protected System &copy; 2024</div>
+    </div>
+
+    <script>
+        // Obfuscated Logic / Configuration
+        (function(){
+            const _0xdb = {
+                'Stun': {b:100, a:'STR', dc:'VIT+AGI', dd:'VIT', f:0.8},
+                'Blind': {b:30, a:'STR', dc:'INT+DEX', dd:'INT', f:0},
+                'Curse': {b:30, a:'STR', dc:'INT+DEX', dd:'INT', f:0},
+                'Fear': {b:30, a:'DEX', dc:'INT+LUK', dd:'INT', f:0},
+                'Sleep': {b:30, a:'DEX', dc:'INT+LUK', dd:'INT', f:0},
+                'Silence': {b:100, a:'DEX', dc:'VIT+STR', dd:'VIT', f:0.6},
+                'Freeze': {b:30, a:'INT', dc:'INT+DEX', dd:'INT', f:0},
+                'Bleed': {b:30, a:'INT', dc:'VIT+INT', dd:'VIT', f:0},
+                'Burn': {b:30, a:'INT', dc:'VIT+AGI', dd:'VIT', f:0},
+                'Stone': {b:30, a:'INT', dc:'INT+DEX', dd:'INT', f:0},
+                'Poison': {b:30, a:'LUK', dc:'VIT+INT', dd:'VIT', f:0},
+                'Snare': {b:30, a:'AGI', dc:'VIT+STR', dd:'VIT', f:0}
+            };
+
+            const _el = (id) => document.getElementById(id);
+            const _val = (id) => parseFloat(_el(id).value) || 0;
+
+            // Security: Disable Keys
+            document.onkeydown = function(e) {
+                if(e.keyCode == 123) { return false; }
+                if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)){ return false; }
+                if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)){ return false; }
+                if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)){ return false; }
+            }
+
+            // Init Dropdown
+            const sSel = _el('i1');
+            for(let k in _0xdb){
+                let opt = document.createElement('option');
+                opt.value = k;
+                opt.innerHTML = k;
+                sSel.appendChild(opt);
+            }
+
+            // Core Logic (Minified)
+            function _c(){
+                const s = sSel.value;
+                const d = _0xdb[s];
+                if(!d) return;
+
+                // Hints
+                _el('hint2').innerText = `(ใช้ ${d.a})`;
+                _el('hint5').innerText = `(ใช้ ${d.dc})`;
+                _el('hint6').innerText = `(ใช้ ${d.dd})`;
+
+                // Inputs
+                const v_as = _val('i2');
+                const v_sa = _val('i3');
+                const v_ca = _val('i4');
+                const v_dc = _val('i5');
+                const v_dd = _val('i6');
+                const v_r = _val('i7');
+                const v_cr = _val('i8');
+
+                // Calc Chance: Base + (Atk - Def)*0.3 + Bonuses - Reductions
+                // Formula derived from sheet analysis:
+                // Chance = Base + floor((Atk - Def)*0.3) - CC_Res - floor(Resist * 0.12)
+                // Note: Adding StatusAtk/CCAtk as standard additive bonuses if applicable
+                let _rawC = d.b + v_sa + v_ca + Math.floor((v_as - v_dc) * 0.3);
+                let _finC = _rawC - v_cr - Math.floor(v_r * 0.12); // Derived constant 0.12
+                if(_finC < 0) _finC = 0;
+                if(_finC > 100) _finC = 100;
+
+                // Calc Duration: 
+                // Stun/Silence logic: |(100 - Def)*Factor| - ResistCorrection
+                // If Factor is 0 (Freeze), Duration is 100%
+                let _finD = 0;
+                if(d.f === 0) {
+                    _finD = 100.00; // Freeze/Others default
+                } else {
+                    // Logic: |(100 - Def) * Factor| - (Resist * 0.016)
+                    let _rawD = (100 - v_dd) * d.f; // Can be negative
+                    // Apply absolute logic based on Silence analysis (220 def -> 72 result)
+                    // If Def > 100, logic inverts or uses Abs.
+                    // Stun (60 def) -> (100-60)*0.8 = 32. Result 31.2. (32 - 50*0.016)
+                    let _baseD = Math.abs((99 - v_dd) * d.f); // Using 99 base or -1 offset pattern
+                    // Correction: Stun result 31.20 with 60 def, 50 res, 0.8 fact.
+                    // (100 - 60)*0.8 = 32. 32 - 0.8 = 31.2. 0.8 is exactly 50*0.016.
+                    // Silence result 72.00 with 220 def, 0 res, 0.6 fact.
+                    // (220 - 100)*0.6 = 72.
+                    // Unified: Abs(100 - Def) * Factor - (Resist * 0.016)
+                    // Let's refine the "99" vs "100" based on Stun.
+                    // If formula is Abs(100 - Def)*Factor. Stun=32. Silence=72.
+                    // Stun needs to lose 0.8. 50 * 0.016 = 0.8.
+                    // So Abs(100 - Def)*Factor - Resist*0.016 works perfectly.
+                    _finD = Math.abs((100 - v_dd) * d.f) - (v_r * 0.016);
+                }
+                if(_finD < 0) _finD = 0;
+
+                // Display
+                _el('r_chance').innerText = _finC.toFixed(2) + '%';
+                _el('r_dur').innerText = _finD.toFixed(2) + '%';
+            }
+
+            // Events
+            sSel.addEventListener('change', _c);
+            ['i2','i3','i4','i5','i6','i7','i8'].forEach(id => {
+                _el(id).addEventListener('input', _c);
+            });
+
+            // Trigger once
+            _c();
+        })();
+    </script>
+</body>
+</html>
