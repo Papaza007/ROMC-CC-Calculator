@@ -3,190 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Status Effect Calculator</title>
+    <title>RO Status Calculator (9 Inputs)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Sarabun', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; user-select: none; -webkit-user-select: none; }
-        .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
-        h2 { text-align: center; color: #333; margin-bottom: 1.5rem; }
-        .form-group { margin-bottom: 1rem; }
-        label { display: block; margin-bottom: 0.5rem; font-weight: bold; color: #555; }
-        select, input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
-        .result-box { margin-top: 1.5rem; padding: 1rem; background: #e9f7ef; border-radius: 8px; border: 1px solid #c3e6cb; }
-        .result-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
-        .result-row:last-child { margin-bottom: 0; }
-        .result-label { font-weight: bold; color: #155724; }
-        .result-value { font-weight: bold; color: #28a745; font-size: 1.2rem; }
-        .stat-hint { font-size: 0.8rem; color: #888; margin-top: 2px; }
-        .security-notice { font-size: 0.7rem; color: #ccc; text-align: center; margin-top: 2rem; }
+        /* Security Styles: Disable Selection & Print */
+        body { 
+            -webkit-user-select: none; 
+            -moz-user-select: none; 
+            -ms-user-select: none; 
+            user-select: none; 
+            background-color: #111827; /* Dark BG */
+        }
+        @media print { body { display: none; } }
+        
+        /* Input Styling */
+        .input-box {
+            background-color: #374151;
+            border: 1px solid #4b5563;
+            color: #f3f4f6;
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+        .input-box:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 1px #3b82f6;
+        }
+        .label-text {
+            color: #9ca3af;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            display: block;
+        }
+        .hint-text {
+            color: #6b7280;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        // --- Security Layer: Anti-Debug & Anti-Copy ---
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', e => {
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) || 
+                (e.ctrlKey && e.key === 'u')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    </script>
 </head>
-<body oncontextmenu="return false;">
-    <div class="container">
-        <h2>Papaza007_CC Calculator</h2>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-2xl bg-gray-800 rounded-xl shadow-2xl border border-gray-700 overflow-hidden">
         
-        <div class="form-group">
-            <label>เลือกสถานะ (Status)</label>
-            <select id="i1"></select>
+        <div class="bg-gradient-to-r from-indigo-600 to-blue-600 p-5 text-center shadow-md relative">
+            <h1 class="text-2xl font-bold text-white tracking-wide">STATUS CALCULATOR</h1>
+            <div class="absolute top-2 right-2 text-indigo-200 text-xs border border-indigo-400 rounded px-1">v2.0</div>
         </div>
 
-        <div class="form-group">
-            <label>ค่า Stat ฝั่งโจมตี <span id="hint2" class="stat-hint"></span></label>
-            <input type="number" id="i2" placeholder="ระบุค่า Stat">
-        </div>
-
-        <div class="form-group">
-            <label>Status Atk %</label>
-            <input type="number" id="i3" value="0">
-        </div>
-
-        <div class="form-group">
-            <label>CC Atk %</label>
-            <input type="number" id="i4" value="0">
-        </div>
-
-        <div class="form-group">
-            <label>ค่า Stat ฝั่งป้องกัน (มีผลกับโอกาส) <span id="hint5" class="stat-hint"></span></label>
-            <input type="number" id="i5" placeholder="ระบุค่ารวม">
-        </div>
-
-        <div class="form-group">
-            <label>ค่า Stat ฝั่งป้องกัน (มีผลกับระยะเวลา) <span id="hint6" class="stat-hint"></span></label>
-            <input type="number" id="i6" placeholder="ระบุค่ารวม">
-        </div>
-
-        <div class="form-group">
-            <label>Resist %</label>
-            <input type="number" id="i7" value="0">
-        </div>
-
-        <div class="form-group">
-            <label>CC Res %</label>
-            <input type="number" id="i8" value="0">
-        </div>
-
-        <div class="result-box">
-            <div class="result-row">
-                <span class="result-label">โอกาสติด:</span>
-                <span class="result-value" id="r_chance">0.00%</span>
+        <div class="p-6 space-y-5">
+            
+            <div>
+                <label class="label-text">[1] เลือกสถานะ (Select Status)</label>
+                <select id="i1" class="input-box bg-gray-900">
+                    </select>
+                <div class="flex justify-between mt-1 px-1">
+                    <span id="hint-atk" class="text-xs text-green-400"></span>
+                    <span id="hint-def" class="text-xs text-red-400"></span>
+                </div>
             </div>
-            <div class="result-row">
-                <span class="result-label">ระยะเวลา:</span>
-                <span class="result-value" id="r_dur">0.00%</span>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                <div>
+                    <label class="label-text">[2] ค่า Stat ฝั่งโจมตี (Attacker Stat)</label>
+                    <input type="number" id="i2" class="input-box" placeholder="e.g. STR/INT">
+                </div>
+                <div>
+                    <label class="label-text">[3] Status Atk %</label>
+                    <input type="number" id="i3" class="input-box" placeholder="e.g. 15">
+                </div>
+
+                <div>
+                    <label class="label-text">[4] CC Atk % (Specific)</label>
+                    <input type="number" id="i4" class="input-box" placeholder="e.g. 20">
+                </div>
+                <div>
+                    <label class="label-text">[5] ค่า Stat ฝั่งรับ (โอกาส/Chance)</label>
+                    <input type="number" id="i5" class="input-box" placeholder="e.g. VIT/LUK">
+                </div>
+
+                <div>
+                    <label class="label-text">[6] ค่า Stat ฝั่งรับ (เวลา/Time)</label>
+                    <input type="number" id="i6" class="input-box" placeholder="e.g. VIT/INT">
+                </div>
+                <div>
+                    <label class="label-text">[7] Resist % (กันสถานะเฉพาะ)</label>
+                    <input type="number" id="i7" class="input-box" placeholder="e.g. 10">
+                </div>
+
+                <div>
+                    <label class="label-text">[8] CC Res % (กันสถานะรวม)</label>
+                    <input type="number" id="i8" class="input-box" placeholder="e.g. 5">
+                </div>
+                <div>
+                    <label class="label-text text-yellow-400">[9] ระยะเวลาพื้นฐานสกิล (วินาที)</label>
+                    <input type="number" id="i9" class="input-box border-yellow-700 focus:border-yellow-500" placeholder="e.g. 3.0 (ถ้าไม่ใส่ = คำนวณ %)">
+                </div>
+            </div>
+
+            <button id="btnCalc" class="w-full mt-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3 rounded-lg shadow-lg transform transition hover:scale-[1.01] active:scale-[0.99]">
+                คำนวณผลลัพธ์ (CALCULATE)
+            </button>
+
+        </div>
+
+        <div id="res-panel" class="hidden bg-gray-900 border-t border-gray-700 p-6">
+            <div class="grid grid-cols-2 gap-8 text-center">
+                <div class="relative group">
+                    <h3 class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">โอกาสติด (CHANCE)</h3>
+                    <div class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-green-400 to-green-600">
+                        <span id="out-chance">0</span><span class="text-2xl">%</span>
+                    </div>
+                </div>
+                
+                <div class="relative group border-l border-gray-800">
+                    <h3 class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">ระยะเวลา (DURATION)</h3>
+                    <div class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-yellow-400 to-orange-500">
+                        <span id="out-time">0</span>
+                    </div>
+                    <p id="out-time-unit" class="text-xs text-gray-500 mt-1">วินาที</p>
+                </div>
             </div>
         </div>
-        
-        <div class="security-notice">Protected System &copy; 2024</div>
+
+        <div class="bg-gray-800 p-2 text-center border-t border-gray-700">
+            <p class="text-[10px] text-gray-600">Protected Algorithm © 2024 | Secure Calculation Module</p>
+        </div>
     </div>
 
     <script>
-        // Obfuscated Logic / Configuration
-        (function(){
-            const _0xdb = {
-                'Stun': {b:100, a:'STR', dc:'VIT+AGI', dd:'VIT', f:0.8},
-                'Blind': {b:30, a:'STR', dc:'INT+DEX', dd:'INT', f:0},
-                'Curse': {b:30, a:'STR', dc:'INT+DEX', dd:'INT', f:0},
-                'Fear': {b:30, a:'DEX', dc:'INT+LUK', dd:'INT', f:0},
-                'Sleep': {b:30, a:'DEX', dc:'INT+LUK', dd:'INT', f:0},
-                'Silence': {b:100, a:'DEX', dc:'VIT+STR', dd:'VIT', f:0.6},
-                'Freeze': {b:30, a:'INT', dc:'INT+DEX', dd:'INT', f:0},
-                'Bleed': {b:30, a:'INT', dc:'VIT+INT', dd:'VIT', f:0},
-                'Burn': {b:30, a:'INT', dc:'VIT+AGI', dd:'VIT', f:0},
-                'Stone': {b:30, a:'INT', dc:'INT+DEX', dd:'INT', f:0},
-                'Poison': {b:30, a:'LUK', dc:'VIT+INT', dd:'VIT', f:0},
-                'Snare': {b:30, a:'AGI', dc:'VIT+STR', dd:'VIT', f:0}
-            };
+        (function() {
+            // --- Configuration Data (Obfuscated) ---
+            // Format: [Name, BaseChance%, AtkStat, DefChanceStat, DefTimeStat, TimeDivisor]
+            const _DB = [
+                ["Stun (มึนงง)",    100, "STR", "VIT+AGI", "VIT", 1250],
+                ["Silence (ใบ้)",   100, "DEX", "VIT+STR", "VIT", 1000],
+                ["Blind (ตาบอด)",    30, "STR", "INT+DEX", "INT", 500],
+                ["Curse (คำสาป)",    30, "LUK", "LUK",     "LUK", 1000],
+                ["Sleep (หลับ)",     30, "INT", "INT",     "INT", 1000],
+                ["Fear (กลัว)",      30, "STR", "INT",     "INT", 1000],
+                ["Freeze (แช่แข็ง)", 30, "INT", "MDEF",    "MDEF", 1000],
+                ["Bleed (เลือดออก)", 30, "STR", "AGI",     "AGI", 1000],
+                ["Poison (พิษ)",     30, "STR", "VIT",     "VIT", 1000]
+            ];
 
-            const _el = (id) => document.getElementById(id);
-            const _val = (id) => parseFloat(_el(id).value) || 0;
+            const el = (id) => document.getElementById(id);
 
-            // Security: Disable Keys
-            document.onkeydown = function(e) {
-                if(e.keyCode == 123) { return false; }
-                if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)){ return false; }
-                if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)){ return false; }
-                if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)){ return false; }
-            }
-
-            // Init Dropdown
-            const sSel = _el('i1');
-            for(let k in _0xdb){
-                let opt = document.createElement('option');
-                opt.value = k;
-                opt.innerHTML = k;
-                sSel.appendChild(opt);
-            }
-
-            // Core Logic (Minified)
-            function _c(){
-                const s = sSel.value;
-                const d = _0xdb[s];
-                if(!d) return;
-
-                // Hints
-                _el('hint2').innerText = `(ใช้ ${d.a})`;
-                _el('hint5').innerText = `(ใช้ ${d.dc})`;
-                _el('hint6').innerText = `(ใช้ ${d.dd})`;
-
-                // Inputs
-                const v_as = _val('i2');
-                const v_sa = _val('i3');
-                const v_ca = _val('i4');
-                const v_dc = _val('i5');
-                const v_dd = _val('i6');
-                const v_r = _val('i7');
-                const v_cr = _val('i8');
-
-                // Calc Chance: Base + (Atk - Def)*0.3 + Bonuses - Reductions
-                // Formula derived from sheet analysis:
-                // Chance = Base + floor((Atk - Def)*0.3) - CC_Res - floor(Resist * 0.12)
-                // Note: Adding StatusAtk/CCAtk as standard additive bonuses if applicable
-                let _rawC = d.b + v_sa + v_ca + Math.floor((v_as - v_dc) * 0.3);
-                let _finC = _rawC - v_cr - Math.floor(v_r * 0.12); // Derived constant 0.12
-                if(_finC < 0) _finC = 0;
-                if(_finC > 100) _finC = 100;
-
-                // Calc Duration: 
-                // Stun/Silence logic: |(100 - Def)*Factor| - ResistCorrection
-                // If Factor is 0 (Freeze), Duration is 100%
-                let _finD = 0;
-                if(d.f === 0) {
-                    _finD = 100.00; // Freeze/Others default
-                } else {
-                    // Logic: |(100 - Def) * Factor| - (Resist * 0.016)
-                    let _rawD = (100 - v_dd) * d.f; // Can be negative
-                    // Apply absolute logic based on Silence analysis (220 def -> 72 result)
-                    // If Def > 100, logic inverts or uses Abs.
-                    // Stun (60 def) -> (100-60)*0.8 = 32. Result 31.2. (32 - 50*0.016)
-                    let _baseD = Math.abs((99 - v_dd) * d.f); // Using 99 base or -1 offset pattern
-                    // Correction: Stun result 31.20 with 60 def, 50 res, 0.8 fact.
-                    // (100 - 60)*0.8 = 32. 32 - 0.8 = 31.2. 0.8 is exactly 50*0.016.
-                    // Silence result 72.00 with 220 def, 0 res, 0.6 fact.
-                    // (220 - 100)*0.6 = 72.
-                    // Unified: Abs(100 - Def) * Factor - (Resist * 0.016)
-                    // Let's refine the "99" vs "100" based on Stun.
-                    // If formula is Abs(100 - Def)*Factor. Stun=32. Silence=72.
-                    // Stun needs to lose 0.8. 50 * 0.016 = 0.8.
-                    // So Abs(100 - Def)*Factor - Resist*0.016 works perfectly.
-                    _finD = Math.abs((100 - v_dd) * d.f) - (v_r * 0.016);
-                }
-                if(_finD < 0) _finD = 0;
-
-                // Display
-                _el('r_chance').innerText = _finC.toFixed(2) + '%';
-                _el('r_dur').innerText = _finD.toFixed(2) + '%';
-            }
-
-            // Events
-            sSel.addEventListener('change', _c);
-            ['i2','i3','i4','i5','i6','i7','i8'].forEach(id => {
-                _el(id).addEventListener('input', _c);
+            // Init UI
+            const sel = el('i1');
+            _DB.forEach((d, i) => {
+                let op = document.createElement('option');
+                op.value = i;
+                op.text = d[0];
+                sel.add(op);
             });
 
-            // Trigger once
-            _c();
+            // Update Hints
+            const updateHints = () => {
+                const d = _DB[sel.value];
+                el('hint-atk').innerText = `[2] ใช้: ${d[2]}`;
+                el('hint-def').innerText = `[5] แก้ทาง: ${d[3]} | [6] ลดเวลา: ${d[4]}`;
+            };
+            sel.addEventListener('change', updateHints);
+            updateHints(); // Initial call
+
+            // Main Calculation Logic
+            el('btnCalc').addEventListener('click', () => {
+                try {
+                    // Fetch Inputs [1] - [9]
+                    const idx = parseInt(el('i1').value);
+                    const v2 = parseFloat(el('i2').value) || 0; // Atk Stat
+                    const v3 = parseFloat(el('i3').value) || 0; // Status Atk %
+                    const v4 = parseFloat(el('i4').value) || 0; // CC Atk %
+                    const v5 = parseFloat(el('i5').value) || 0; // Def Stat (Chance)
+                    const v6 = parseFloat(el('i6').value) || 0; // Def Stat (Time)
+                    const v7 = parseFloat(el('i7').value) || 0; // Resist %
+                    const v8 = parseFloat(el('i8').value) || 0; // CC Res %
+                    const v9 = parseFloat(el('i9').value) || 0; // Base Duration (Sec)
+
+                    const data = _DB[idx];
+                    
+                    // --- 1. Chance Calculation ---
+                    // Base + (AtkStat - DefStat)*0.2 + Modifiers
+                    let chance = data[1] + ((v2 - v5) * 0.2);
+                    chance = chance + v3 + v4 - v7 - v8;
+                    
+                    if (chance < 0) chance = 0;
+                    if (chance > 100) chance = 100; // Visual cap, though some games allow >100
+
+                    // --- 2. Duration Calculation ---
+                    // TimeFactor = (1 - DefStat/Divisor) * (1 - CCRes - Res)
+                    // Note: In some formulas, Resist reduces chance only, but often affects time too.
+                    // Assuming Standard Logic: Stat reduces base time, Res reduces final time.
+                    
+                    let timeReducStat = v6 / data[5]; // e.g. 250 VIT / 1250 = 0.2 (20% reduction)
+                    if (timeReducStat > 1) timeReducStat = 1;
+                    
+                    // Resistance Multiplier (Treating Inputs 7 & 8 as % reduction to time as well)
+                    // If strictly separate: Modify this line.
+                    let resistMult = 1 - ((v7 + v8) / 100);
+                    if (resistMult < 0) resistMult = 0;
+
+                    let finalTimePct = (1 - timeReducStat) * resistMult;
+                    
+                    // Display Logic
+                    el('out-chance').innerText = chance.toFixed(2);
+                    
+                    if (v9 > 0) {
+                        // If Base Duration [9] is provided, show Seconds
+                        let finalSec = v9 * finalTimePct;
+                        el('out-time').innerText = finalSec.toFixed(3); // 3 decimals for precision
+                        el('out-time-unit').innerText = `วินาที (จากพื้นฐาน ${v9} วิ)`;
+                    } else {
+                        // If not provided, show %
+                        el('out-time').innerText = (finalTimePct * 100).toFixed(2) + "%";
+                        el('out-time-unit').innerText = "ของระยะเวลาปกติ";
+                    }
+
+                    // Show Result Panel with Animation
+                    const resPanel = el('res-panel');
+                    resPanel.classList.remove('hidden');
+                    resPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+                } catch (err) {
+                    console.error("Err", err);
+                    alert("กรุณากรอกตัวเลขให้ครบถ้วน");
+                }
+            });
+
         })();
     </script>
 </body>
-
 </html>
