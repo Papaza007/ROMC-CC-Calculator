@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RO Status Calculator (Single View)</title>
+    <title>ROMC Status Calculator (Single View) by Papaza007</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
@@ -211,7 +211,7 @@
 
 <div class="dashboard">
     <div class="header-section">
-        <h1>Status Calculator</h1>
+        <h1>ROMC CC Calculator by Papaza007</h1>
         <div class="select-wrapper">
             <select id="statusSelect">
                 </select>
@@ -224,11 +224,11 @@
             <div class="card" style="margin-bottom: 20px;">
                 <div class="card-title t-base">Base Information</div>
                 <div class="input-group">
-                    <label>โอกาสติดพื้นฐาน (Base Chance)</label>
+                    <label>โอกาสติดพื้นฐาน</label>
                     <input type="number" id="inp_base" value="50" placeholder="%">
                 </div>
                 <div class="input-group">
-                    <label>เวลาพื้นฐาน (Base Time)</label>
+                    <label>เวลาติดสถานะพื้นฐาน</label>
                     <input type="number" id="inp_time" value="10" placeholder="Sec">
                 </div>
             </div>
@@ -239,15 +239,15 @@
                     <span id="lbl_atk_stat" class="stat-badge" style="background:var(--c-atk)">STR</span>
                 </div>
                 <div class="input-group">
-                    <label>ค่า Stat ผู้ทำ (Stat Value)</label>
+                    <label>ค่า Stat ผู้โจมตี (Stat Value)</label>
                     <input type="number" id="inp_atk_stat" value="0">
                 </div>
                 <div class="input-group">
-                    <label>Status Atk % (การ์ด/สกิล)</label>
+                    <label>Status Atk % ส่วนเสริม เช่นการ์ดผีผ้า+25%</label>
                     <input type="number" id="inp_status_atk" value="0">
                 </div>
                 <div class="input-group">
-                    <label>Special/CC Atk %</label>
+                    <label>ส่วนเสริมเวลา CC เช่น เการ์ดผีผ้า+25%</label>
                     <input type="number" id="inp_cc_atk" value="0">
                 </div>
             </div>
@@ -259,25 +259,25 @@
                     Defender (ฝ่ายป้องกัน)
                 </div>
                 <div class="input-group">
-                    <label>Stat กันติด <span id="lbl_def_chance" class="stat-badge">VIT+LUK</span></label>
+                    <label>Stat ส่วนลดโอกาส ใช้><span id="lbl_def_chance" class="stat-badge">VIT+LUK</span></label>
                     <input type="number" id="inp_def_chance" value="0">
                 </div>
                 <div class="input-group">
-                    <label>Stat ลดเวลา <span id="lbl_def_time" class="stat-badge">VIT</span></label>
+                    <label>Stat ส่วนลดเวลา ใช้><span id="lbl_def_time" class="stat-badge">VIT</span></label>
                     <input type="number" id="inp_def_time" value="0">
                 </div>
             </div>
 
             <div class="card">
                 <div class="card-title t-def" style="border-color: var(--c-res); color: var(--c-res);">
-                    Resistance (ของสวมใส่)
+                    Resistance (ออพแมว/การ์ดหมายาย,ดาร์คหลอดดาว)
                 </div>
                 <div class="input-group">
                     <label>Resist % (กันสถานะ)</label>
                     <input type="number" id="inp_res" value="0">
                 </div>
                 <div class="input-group">
-                    <label>Special/CC Resist %</label>
+                    <label>CC Resist %</label>
                     <input type="number" id="inp_cc_res" value="0">
                 </div>
             </div>
@@ -287,21 +287,21 @@
 
     <div class="result-section">
         <div class="res-box">
-            <h3>Chance</h3>
+            <h3>โอกาสติด</h3>
             <div class="res-value v-chance" id="res_chance">0<span class="unit">%</span></div>
         </div>
         <div class="res-box">
-            <h3>Duration</h3>
+            <h3>% เวลาติด</h3>
             <div class="res-value v-duration" id="res_duration_pct">100<span class="unit">%</span></div>
         </div>
         <div class="res-box">
-            <h3>Final Time</h3>
+            <h3>เวลาติด</h3>
             <div class="res-value v-time" id="res_final_time">0.00<span class="unit">s</span></div>
         </div>
     </div>
     
     <div class="footer">
-        Private Tool for Guild Members Only.
+        Engine by Papaza007
     </div>
 
 </div>
@@ -462,3 +462,4 @@
 
 </body>
 </html>
+
