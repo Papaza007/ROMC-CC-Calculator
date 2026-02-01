@@ -3,251 +3,462 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RO Status Calculator (9 Inputs)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>RO Status Calculator (Single View)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    
     <style>
-        /* Security Styles: Disable Selection & Print */
-        body { 
-            -webkit-user-select: none; 
-            -moz-user-select: none; 
-            -ms-user-select: none; 
-            user-select: none; 
-            background-color: #111827; /* Dark BG */
+        :root {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --border: #334155;
+            
+            /* Status Colors */
+            --c-atk: #ef4444;
+            --c-def: #3b82f6;
+            --c-res: #10b981;
+            --c-gold: #f59e0b;
         }
-        @media print { body { display: none; } }
-        
-        /* Input Styling */
-        .input-box {
-            background-color: #374151;
-            border: 1px solid #4b5563;
-            color: #f3f4f6;
-            border-radius: 0.375rem;
-            padding: 0.5rem 0.75rem;
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+        }
+
+        .dashboard {
+            background: var(--bg-card);
             width: 100%;
-            transition: border-color 0.2s;
+            max-width: 900px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+            padding: 30px;
         }
-        .input-box:focus {
+
+        /* --- Header & Selector --- */
+        .header-section {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+        
+        h1 { margin: 0 0 10px 0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .select-wrapper {
+            position: relative;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 20px;
+            background: var(--bg-input);
+            color: #fff;
+            border: 2px solid var(--accent);
+            border-radius: 10px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1.1rem;
+            cursor: pointer;
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 1px #3b82f6;
+            appearance: none; /* Hide default arrow */
         }
-        .label-text {
-            color: #9ca3af;
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-bottom: 0.25rem;
-            display: block;
+        
+        /* Custom Arrow */
+        .select-wrapper::after {
+            content: '▼';
+            font-size: 0.8rem;
+            color: var(--accent);
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
         }
-        .hint-text {
-            color: #6b7280;
+
+        /* --- Grid Layout --- */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-layout { grid-template-columns: 1fr; }
+        }
+
+        /* --- Cards --- */
+        .card {
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .card-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .t-atk { color: var(--c-atk); border-color: var(--c-atk); }
+        .t-def { color: var(--c-def); border-color: var(--c-def); }
+        .t-base { color: var(--text-muted); border-color: var(--text-muted); }
+
+        /* --- Input Groups --- */
+        .input-group {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .input-group label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            flex: 1;
+        }
+
+        .stat-badge {
             font-size: 0.75rem;
-            margin-top: 0.25rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #334155;
+            color: #fff;
+            margin-right: 10px;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        input[type="number"] {
+            width: 80px;
+            background: var(--bg-body);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        /* --- Result Section --- */
+        .result-section {
+            margin-top: 30px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .res-box h3 {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .res-value {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin: 5px 0 0 0;
+            line-height: 1;
+        }
+
+        .v-chance { color: var(--c-gold); text-shadow: 0 0 15px rgba(245, 158, 11, 0.2); }
+        .v-duration { color: var(--c-def); }
+        .v-time { color: var(--c-res); text-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
+        
+        .unit { font-size: 1rem; color: var(--text-muted); font-weight: 400; }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #475569;
         }
     </style>
-    <script>
-        // --- Security Layer: Anti-Debug & Anti-Copy ---
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.addEventListener('keydown', e => {
-            if (e.key === 'F12' || 
-                (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) || 
-                (e.ctrlKey && e.key === 'u')) {
-                e.preventDefault();
-                return false;
-            }
-        });
-    </script>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body oncontextmenu="return false;">
 
-    <div class="w-full max-w-2xl bg-gray-800 rounded-xl shadow-2xl border border-gray-700 overflow-hidden">
-        
-        <div class="bg-gradient-to-r from-indigo-600 to-blue-600 p-5 text-center shadow-md relative">
-            <h1 class="text-2xl font-bold text-white tracking-wide">STATUS CALCULATOR</h1>
-            <div class="absolute top-2 right-2 text-indigo-200 text-xs border border-indigo-400 rounded px-1">v2.0</div>
-        </div>
-
-        <div class="p-6 space-y-5">
-            
-            <div>
-                <label class="label-text">[1] เลือกสถานะ (Select Status)</label>
-                <select id="i1" class="input-box bg-gray-900">
-                    </select>
-                <div class="flex justify-between mt-1 px-1">
-                    <span id="hint-atk" class="text-xs text-green-400"></span>
-                    <span id="hint-def" class="text-xs text-red-400"></span>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                
-                <div>
-                    <label class="label-text">[2] ค่า Stat ฝั่งโจมตี (Attacker Stat)</label>
-                    <input type="number" id="i2" class="input-box" placeholder="e.g. STR/INT">
-                </div>
-                <div>
-                    <label class="label-text">[3] Status Atk %</label>
-                    <input type="number" id="i3" class="input-box" placeholder="e.g. 15">
-                </div>
-
-                <div>
-                    <label class="label-text">[4] CC Atk % (Specific)</label>
-                    <input type="number" id="i4" class="input-box" placeholder="e.g. 20">
-                </div>
-                <div>
-                    <label class="label-text">[5] ค่า Stat ฝั่งรับ (โอกาส/Chance)</label>
-                    <input type="number" id="i5" class="input-box" placeholder="e.g. VIT/LUK">
-                </div>
-
-                <div>
-                    <label class="label-text">[6] ค่า Stat ฝั่งรับ (เวลา/Time)</label>
-                    <input type="number" id="i6" class="input-box" placeholder="e.g. VIT/INT">
-                </div>
-                <div>
-                    <label class="label-text">[7] Resist % (กันสถานะเฉพาะ)</label>
-                    <input type="number" id="i7" class="input-box" placeholder="e.g. 10">
-                </div>
-
-                <div>
-                    <label class="label-text">[8] CC Res % (กันสถานะรวม)</label>
-                    <input type="number" id="i8" class="input-box" placeholder="e.g. 5">
-                </div>
-                <div>
-                    <label class="label-text text-yellow-400">[9] ระยะเวลาพื้นฐานสกิล (วินาที)</label>
-                    <input type="number" id="i9" class="input-box border-yellow-700 focus:border-yellow-500" placeholder="e.g. 3.0 (ถ้าไม่ใส่ = คำนวณ %)">
-                </div>
-            </div>
-
-            <button id="btnCalc" class="w-full mt-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3 rounded-lg shadow-lg transform transition hover:scale-[1.01] active:scale-[0.99]">
-                คำนวณผลลัพธ์ (CALCULATE)
-            </button>
-
-        </div>
-
-        <div id="res-panel" class="hidden bg-gray-900 border-t border-gray-700 p-6">
-            <div class="grid grid-cols-2 gap-8 text-center">
-                <div class="relative group">
-                    <h3 class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">โอกาสติด (CHANCE)</h3>
-                    <div class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-green-400 to-green-600">
-                        <span id="out-chance">0</span><span class="text-2xl">%</span>
-                    </div>
-                </div>
-                
-                <div class="relative group border-l border-gray-800">
-                    <h3 class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">ระยะเวลา (DURATION)</h3>
-                    <div class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-yellow-400 to-orange-500">
-                        <span id="out-time">0</span>
-                    </div>
-                    <p id="out-time-unit" class="text-xs text-gray-500 mt-1">วินาที</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-gray-800 p-2 text-center border-t border-gray-700">
-            <p class="text-[10px] text-gray-600">Protected Algorithm © 2024 | Secure Calculation Module</p>
+<div class="dashboard">
+    <div class="header-section">
+        <h1>Status Calculator</h1>
+        <div class="select-wrapper">
+            <select id="statusSelect">
+                </select>
         </div>
     </div>
 
-    <script>
-        (function() {
-            // --- Configuration Data (Obfuscated) ---
-            // Format: [Name, BaseChance%, AtkStat, DefChanceStat, DefTimeStat, TimeDivisor]
-            const _DB = [
-                ["Stun (มึนงง)",    100, "STR", "VIT+AGI", "VIT", 1250],
-                ["Silence (ใบ้)",   100, "DEX", "VIT+STR", "VIT", 1000],
-                ["Blind (ตาบอด)",    30, "STR", "INT+DEX", "INT", 500],
-                ["Curse (คำสาป)",    30, "LUK", "LUK",     "LUK", 1000],
-                ["Sleep (หลับ)",     30, "INT", "INT",     "INT", 1000],
-                ["Fear (กลัว)",      30, "STR", "INT",     "INT", 1000],
-                ["Freeze (แช่แข็ง)", 30, "INT", "MDEF",    "MDEF", 1000],
-                ["Bleed (เลือดออก)", 30, "STR", "AGI",     "AGI", 1000],
-                ["Poison (พิษ)",     30, "STR", "VIT",     "VIT", 1000]
-            ];
+    <div class="grid-layout">
+        
+        <div class="col-left">
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-title t-base">Base Information</div>
+                <div class="input-group">
+                    <label>โอกาสติดพื้นฐาน (Base Chance)</label>
+                    <input type="number" id="inp_base" value="50" placeholder="%">
+                </div>
+                <div class="input-group">
+                    <label>เวลาพื้นฐาน (Base Time)</label>
+                    <input type="number" id="inp_time" value="10" placeholder="Sec">
+                </div>
+            </div>
 
-            const el = (id) => document.getElementById(id);
+            <div class="card">
+                <div class="card-title t-atk">
+                    Attacker (ฝ่ายโจมตี)
+                    <span id="lbl_atk_stat" class="stat-badge" style="background:var(--c-atk)">STR</span>
+                </div>
+                <div class="input-group">
+                    <label>ค่า Stat ผู้ทำ (Stat Value)</label>
+                    <input type="number" id="inp_atk_stat" value="0">
+                </div>
+                <div class="input-group">
+                    <label>Status Atk % (การ์ด/สกิล)</label>
+                    <input type="number" id="inp_status_atk" value="0">
+                </div>
+                <div class="input-group">
+                    <label>Special/CC Atk %</label>
+                    <input type="number" id="inp_cc_atk" value="0">
+                </div>
+            </div>
+        </div>
 
-            // Init UI
-            const sel = el('i1');
-            _DB.forEach((d, i) => {
-                let op = document.createElement('option');
-                op.value = i;
-                op.text = d[0];
-                sel.add(op);
-            });
+        <div class="col-right">
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-title t-def">
+                    Defender (ฝ่ายป้องกัน)
+                </div>
+                <div class="input-group">
+                    <label>Stat กันติด <span id="lbl_def_chance" class="stat-badge">VIT+LUK</span></label>
+                    <input type="number" id="inp_def_chance" value="0">
+                </div>
+                <div class="input-group">
+                    <label>Stat ลดเวลา <span id="lbl_def_time" class="stat-badge">VIT</span></label>
+                    <input type="number" id="inp_def_time" value="0">
+                </div>
+            </div>
 
-            // Update Hints
-            const updateHints = () => {
-                const d = _DB[sel.value];
-                el('hint-atk').innerText = `[2] ใช้: ${d[2]}`;
-                el('hint-def').innerText = `[5] แก้ทาง: ${d[3]} | [6] ลดเวลา: ${d[4]}`;
-            };
-            sel.addEventListener('change', updateHints);
-            updateHints(); // Initial call
+            <div class="card">
+                <div class="card-title t-def" style="border-color: var(--c-res); color: var(--c-res);">
+                    Resistance (ของสวมใส่)
+                </div>
+                <div class="input-group">
+                    <label>Resist % (กันสถานะ)</label>
+                    <input type="number" id="inp_res" value="0">
+                </div>
+                <div class="input-group">
+                    <label>Special/CC Resist %</label>
+                    <input type="number" id="inp_cc_res" value="0">
+                </div>
+            </div>
+        </div>
 
-            // Main Calculation Logic
-            el('btnCalc').addEventListener('click', () => {
-                try {
-                    // Fetch Inputs [1] - [9]
-                    const idx = parseInt(el('i1').value);
-                    const v2 = parseFloat(el('i2').value) || 0; // Atk Stat
-                    const v3 = parseFloat(el('i3').value) || 0; // Status Atk %
-                    const v4 = parseFloat(el('i4').value) || 0; // CC Atk %
-                    const v5 = parseFloat(el('i5').value) || 0; // Def Stat (Chance)
-                    const v6 = parseFloat(el('i6').value) || 0; // Def Stat (Time)
-                    const v7 = parseFloat(el('i7').value) || 0; // Resist %
-                    const v8 = parseFloat(el('i8').value) || 0; // CC Res %
-                    const v9 = parseFloat(el('i9').value) || 0; // Base Duration (Sec)
+    </div>
 
-                    const data = _DB[idx];
-                    
-                    // --- 1. Chance Calculation ---
-                    // Base + (AtkStat - DefStat)*0.2 + Modifiers
-                    let chance = data[1] + ((v2 - v5) * 0.2);
-                    chance = chance + v3 + v4 - v7 - v8;
-                    
-                    if (chance < 0) chance = 0;
-                    if (chance > 100) chance = 100; // Visual cap, though some games allow >100
+    <div class="result-section">
+        <div class="res-box">
+            <h3>Chance</h3>
+            <div class="res-value v-chance" id="res_chance">0<span class="unit">%</span></div>
+        </div>
+        <div class="res-box">
+            <h3>Duration</h3>
+            <div class="res-value v-duration" id="res_duration_pct">100<span class="unit">%</span></div>
+        </div>
+        <div class="res-box">
+            <h3>Final Time</h3>
+            <div class="res-value v-time" id="res_final_time">0.00<span class="unit">s</span></div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        Private Tool for Guild Members Only.
+    </div>
 
-                    // --- 2. Duration Calculation ---
-                    // TimeFactor = (1 - DefStat/Divisor) * (1 - CCRes - Res)
-                    // Note: In some formulas, Resist reduces chance only, but often affects time too.
-                    // Assuming Standard Logic: Stat reduces base time, Res reduces final time.
-                    
-                    let timeReducStat = v6 / data[5]; // e.g. 250 VIT / 1250 = 0.2 (20% reduction)
-                    if (timeReducStat > 1) timeReducStat = 1;
-                    
-                    // Resistance Multiplier (Treating Inputs 7 & 8 as % reduction to time as well)
-                    // If strictly separate: Modify this line.
-                    let resistMult = 1 - ((v7 + v8) / 100);
-                    if (resistMult < 0) resistMult = 0;
+</div>
 
-                    let finalTimePct = (1 - timeReducStat) * resistMult;
-                    
-                    // Display Logic
-                    el('out-chance').innerText = chance.toFixed(2);
-                    
-                    if (v9 > 0) {
-                        // If Base Duration [9] is provided, show Seconds
-                        let finalSec = v9 * finalTimePct;
-                        el('out-time').innerText = finalSec.toFixed(3); // 3 decimals for precision
-                        el('out-time-unit').innerText = `วินาที (จากพื้นฐาน ${v9} วิ)`;
-                    } else {
-                        // If not provided, show %
-                        el('out-time').innerText = (finalTimePct * 100).toFixed(2) + "%";
-                        el('out-time-unit').innerText = "ของระยะเวลาปกติ";
-                    }
+<script>
+    (function(){
+        // Security
+        document.onkeydown = function(e) {
+            if(e.keyCode == 123) return false;
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
+            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+        };
 
-                    // Show Result Panel with Animation
-                    const resPanel = el('res-panel');
-                    resPanel.classList.remove('hidden');
-                    resPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        // Data Config
+        const config = [
+            { name: 'Stun',    atk: 'STR', defC: 'VIT+AGI', defT: 'VIT' },
+            { name: 'Blind',   atk: 'STR', defC: 'INT+DEX', defT: 'INT' },
+            { name: 'Curse',   atk: 'STR', defC: 'INT+DEX', defT: 'INT' },
+            { name: 'Fear',    atk: 'DEX', defC: 'INT+LUK', defT: 'INT' },
+            { name: 'Sleep',   atk: 'DEX', defC: 'INT+LUK', defT: 'INT' },
+            { name: 'Silence', atk: 'DEX', defC: 'VIT+STR', defT: 'VIT' },
+            { name: 'Freeze',  atk: 'INT', defC: 'INT+DEX', defT: 'INT' },
+            { name: 'Bleed',   atk: 'INT', defC: 'VIT+INT', defT: 'VIT' },
+            { name: 'Burn',    atk: 'INT', defC: 'VIT+AGI', defT: 'VIT' },
+            { name: 'Stone',   atk: 'INT', defC: 'INT+DEX', defT: 'INT' },
+            { name: 'Poison',  atk: 'LUK', defC: 'VIT+INT', defT: 'VIT' },
+            { name: 'Snare',   atk: 'AGI', defC: 'VIT+STR', defT: 'VIT' }
+        ];
 
-                } catch (err) {
-                    console.error("Err", err);
-                    alert("กรุณากรอกตัวเลขให้ครบถ้วน");
-                }
-            });
+        // UI References
+        const select = document.getElementById('statusSelect');
+        const labels = {
+            atk: document.getElementById('lbl_atk_stat'),
+            defC: document.getElementById('lbl_def_chance'),
+            defT: document.getElementById('lbl_def_time')
+        };
+        const inputs = {
+            base: document.getElementById('inp_base'),
+            time: document.getElementById('inp_time'),
+            atkStat: document.getElementById('inp_atk_stat'),
+            statusAtk: document.getElementById('inp_status_atk'),
+            ccAtk: document.getElementById('inp_cc_atk'),
+            defChance: document.getElementById('inp_def_chance'),
+            defTime: document.getElementById('inp_def_time'),
+            res: document.getElementById('inp_res'),
+            ccRes: document.getElementById('inp_cc_res')
+        };
+        const results = {
+            chance: document.getElementById('res_chance'),
+            durPct: document.getElementById('res_duration_pct'),
+            finalTime: document.getElementById('res_final_time')
+        };
 
-        })();
-    </script>
+        // 1. Initialize Dropdown
+        config.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.name;
+            opt.innerText = c.name;
+            select.appendChild(opt);
+        });
+
+        // 2. Logic to Update Labels
+        function updateLabels() {
+            const currentName = select.value;
+            const data = config.find(c => c.name === currentName);
+            
+            labels.atk.innerText = data.atk;
+            labels.defC.innerText = data.defC;
+            labels.defT.innerText = data.defT;
+        }
+
+        // 3. Calculation Logic (The Formulas)
+        function calculate() {
+            const statusName = select.value;
+            const getVal = (el) => parseFloat(el.value) || 0;
+
+            // Gather Inputs
+            const B3 = getVal(inputs.base);
+            const C3 = getVal(inputs.time);
+            const E3 = getVal(inputs.atkStat);
+            const F3 = getVal(inputs.statusAtk);
+            const G3 = getVal(inputs.ccAtk);
+            const I3 = getVal(inputs.defChance);
+            const K3 = getVal(inputs.defTime);
+            const L3 = getVal(inputs.res);
+            const M3 = getVal(inputs.ccRes);
+
+            // --- FORMULA Q (Hidden Factor) ---
+            let q_limit1;
+            if (['Blind', 'Curse', 'Bleed'].includes(statusName)) q_limit1 = 1;
+            else q_limit1 = 0.8;
+
+            let q_poison_factor = (statusName === 'Poison') ? 0.2 : 0.3;
+            let q_limit2 = (E3 * q_poison_factor) / 100;
+
+            const Q3 = Math.min(q_limit1, q_limit2);
+
+            // --- FORMULA N (Chance) ---
+            let n_part1 = B3 * (1 + (F3/100) - (L3/100));
+
+            let n_limitA;
+            if (['Blind', 'Curse', 'Silence'].includes(statusName)) n_limitA = 1;
+            else if (['Bleed', 'Burn', 'Poison'].includes(statusName)) n_limitA = 0.8;
+            else n_limitA = 0.6;
+
+            let n_bonusA_factor;
+            if (['Stun', 'Sleep', 'Freeze', 'Stone', 'Snare'].includes(statusName)) n_bonusA_factor = 0.2;
+            else n_bonusA_factor = 0.3;
+            let n_bonusA = (E3 * n_bonusA_factor) / 100;
+
+            let n_malusA_factor;
+            if (['Curse', 'Silence'].includes(statusName)) n_malusA_factor = 0.3;
+            else n_malusA_factor = 0.2;
+            let n_malusA = (I3 * n_malusA_factor) / 100;
+
+            let n_term2 = 1 + Math.min(n_limitA, n_bonusA) - Math.min(1, n_malusA);
+
+            const ResultN = Math.max(0, n_part1 * n_term2);
+
+            // --- FORMULA O (Duration %) ---
+            let o_gear = 1 + ((G3 - M3) / 100);
+            let o_stat_reduc = Math.min(1, (K3 * 0.4) / 100);
+            let o_stat_mod = 1 + (Q3 - o_stat_reduc);
+
+            const ResultO = Math.min(1, Math.max(0, 1 * o_gear * o_stat_mod));
+
+            // --- FORMULA P (Final Time) ---
+            const ResultP = ResultO * C3;
+
+            // --- Display ---
+            results.chance.innerHTML = ResultN.toFixed(2) + '<span class="unit">%</span>';
+            results.durPct.innerHTML = (ResultO * 100).toFixed(0) + '<span class="unit">%</span>';
+            results.finalTime.innerHTML = ResultP.toFixed(2) + '<span class="unit">s</span>';
+            
+            // Dim if zero chance
+            if(ResultN === 0) results.finalTime.style.opacity = 0.3;
+            else results.finalTime.style.opacity = 1;
+        }
+
+        // Event Listeners
+        select.addEventListener('change', () => {
+            updateLabels();
+            calculate();
+        });
+
+        Object.values(inputs).forEach(inp => {
+            inp.addEventListener('input', calculate);
+        });
+
+        // Init
+        updateLabels();
+        calculate();
+
+    })();
+</script>
+
 </body>
 </html>
