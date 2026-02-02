@@ -1,41 +1,317 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROMC CC Calculator by Papaza007</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --border: #334155;
+            
+            /* Status Colors */
+            --c-atk: #ef4444;
+            --c-def: #3b82f6;
+            --c-res: #10b981;
+            --c-gold: #f59e0b;
+        }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+        }
+
+        .dashboard {
+            background: var(--bg-card);
+            width: 100%;
+            max-width: 900px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+            padding: 30px;
+        }
+
+        /* --- Header & Selector --- */
+        .header-section {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+        
+        h1 { margin: 0 0 10px 0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .select-wrapper {
+            position: relative;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 20px;
+            background: var(--bg-input);
+            color: #fff;
+            border: 2px solid var(--accent);
+            border-radius: 10px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1.1rem;
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+        }
+        
+        .select-wrapper::after {
+            content: '▼';
+            font-size: 0.8rem;
+            color: var(--accent);
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        /* --- Grid Layout --- */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-layout { grid-template-columns: 1fr; }
+        }
+
+        /* --- Cards --- */
+        .card {
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .card-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .t-atk { color: var(--c-atk); border-color: var(--c-atk); }
+        .t-def { color: var(--c-def); border-color: var(--c-def); }
+        .t-base { color: var(--text-muted); border-color: var(--text-muted); }
+
+        /* --- Input Groups --- */
+        .input-group {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .input-group label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            flex: 1;
+        }
+
+        .stat-badge {
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #334155;
+            color: #fff;
+            margin-right: 10px;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        input[type="number"] {
+            width: 80px;
+            background: var(--bg-body);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        /* --- Result Section --- */
+        .result-section {
+            margin-top: 30px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .res-box h3 {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .res-value {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin: 5px 0 0 0;
+            line-height: 1;
+        }
+
+        .v-chance { color: var(--c-gold); text-shadow: 0 0 15px rgba(245, 158, 11, 0.2); }
+        .v-duration { color: var(--c-def); }
+        .v-time { color: var(--c-res); text-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
+        
+        .unit { font-size: 1rem; color: var(--text-muted); font-weight: 400; }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #475569;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+<div class="dashboard">
+    <div class="header-section">
+        <h1>CC Calculator by Papaza007</h1>
+        <div class="select-wrapper">
+            <select id="statusSelect">
+                </select>
+        </div>
+    </div>
+
+    <div class="grid-layout">
+        
+        <div class="col-left">
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-title t-base">Base Information</div>
+                <div class="input-group">
+                    <label>โอกาสติดพื้นฐาน (Base Chance)</label>
+                    <input type="number" id="inp_base" value="50" placeholder="%">
+                </div>
+                <div class="input-group">
+                    <label>เวลาพื้นฐาน (Base Time)</label>
+                    <input type="number" id="inp_time" value="10" placeholder="Sec">
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title t-atk">
+                    Attacker (ฝ่ายโจมตี)
+                    <span id="lbl_atk_stat" class="stat-badge" style="background:var(--c-atk)">STR</span>
+                </div>
+                <div class="input-group">
+                    <label>ค่า Stat ผู้โจมตี (Stat Value)</label>
+                    <input type="number" id="inp_atk_stat" value="0">
+                </div>
+                <div class="input-group">
+                    <label>Status Atk% (เช่น การ์ดผีผ้าดาว จะบวกอีก 25%)</label>
+                    <input type="number" id="inp_status_atk" value="0">
+                </div>
+                <div class="input-group">
+                    <label>Special/CC Atk %</label>
+                    <input type="number" id="inp_cc_atk" value="0">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-right">
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-title t-def">
+                    Defender (ฝ่ายป้องกัน)
+                </div>
+                <div class="input-group">
+                    <label>Statกันติด ใส่ผลรวมของ-><span id="lbl_def_chance" class="stat-badge">VIT+LUK</span></label>
+                    <input type="number" id="inp_def_chance" value="0">
+                </div>
+                <div class="input-group">
+                    <label>Statลดเวลา ใส่ผลรวมของ-><span id="lbl_def_time" class="stat-badge">VIT</span></label>
+                    <input type="number" id="inp_def_time" value="0">
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title t-def" style="border-color: var(--c-res); color: var(--c-res);">
+                    Resistance (จากของสวมใส่ , การ์ด , สกิลป้องกัน)
+                </div>
+                <div class="input-group">
+                    <label>Resist % (กันสถานะ)</label>
+                    <input type="number" id="inp_res" value="0">
+                </div>
+                <div class="input-group">
+                    <label>CC Resist% (เช่น จากการ์ดหมายาย)</label>
+                    <input type="number" id="inp_cc_res" value="0">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="result-section">
+        <div class="res-box">
+            <h3>Chance</h3>
+            <div class="res-value v-chance" id="res_chance">0<span class="unit">%</span></div>
+        </div>
+        <div class="res-box">
+            <h3>Duration</h3>
+            <div class="res-value v-duration" id="res_duration_pct">100<span class="unit">%</span></div>
+        </div>
+        <div class="res-box">
+            <h3>Final Time</h3>
+            <div class="res-value v-time" id="res_final_time">0.00<span class="unit">s</span></div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        Powered by Papaza007
+    </div>
+
+</div>
+
 <script>
     (function(){
-        // Security Code เดิมของคุณ
-        document.onkeydown = function(e) {
-            if(e.keyCode == 123) return false;
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
-            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
-        };
-
-        // --- ใส่ลิงก์ที่คุณได้จาก Google Apps Script ตรงนี้ ---
+        // ใส่ Link ที่ได้จากการ Deploy ตรงนี้
         const API_URL = "https://script.google.com/macros/s/AKfycbxq1Xt6iBO2CUtIcFpo0SkNOW6_k-xscFpGM0WsThT0lTVV5WafrO4dk90NEBtDGJBk-g/exec"; 
-        // ตัวอย่าง: const API_URL = "https://script.google.com/macros/s/AKfycbx.../exec";
 
-        // Data Config สำหรับ Dropdown
-        const config = [
-            { name: 'Stun',    atk: 'STR', defC: 'VIT+AGI', defT: 'VIT' },
-            { name: 'Blind',   atk: 'STR', defC: 'INT+DEX', defT: 'INT' },
-            { name: 'Curse',   atk: 'STR', defC: 'INT+DEX', defT: 'INT' },
-            { name: 'Fear',    atk: 'DEX', defC: 'INT+LUK', defT: 'INT' },
-            { name: 'Sleep',   atk: 'DEX', defC: 'INT+LUK', defT: 'INT' },
-            { name: 'Silence', atk: 'DEX', defC: 'VIT+STR', defT: 'VIT' },
-            { name: 'Freeze',  atk: 'INT', defC: 'INT+DEX', defT: 'INT' },
-            { name: 'Bleed',   atk: 'INT', defC: 'VIT+INT', defT: 'VIT' },
-            { name: 'Burn',    atk: 'INT', defC: 'VIT+AGI', defT: 'VIT' },
-            { name: 'Stone',   atk: 'INT', defC: 'INT+DEX', defT: 'INT' },
-            { name: 'Poison',  atk: 'LUK', defC: 'VIT+INT', defT: 'VIT' },
-            { name: 'Snare',   atk: 'AGI', defC: 'VIT+STR', defT: 'VIT' }
-        ];
-
-        // UI References
+        // ตัวแปร UI
         const select = document.getElementById('statusSelect');
-        const labels = {
-            atk: document.getElementById('lbl_atk_stat'),
-            defC: document.getElementById('lbl_def_chance'),
-            defT: document.getElementById('lbl_def_time')
-        };
         const inputs = {
             base: document.getElementById('inp_base'),
             time: document.getElementById('inp_time'),
@@ -52,82 +328,84 @@
             durPct: document.getElementById('res_duration_pct'),
             finalTime: document.getElementById('res_final_time')
         };
+        
+        // Config สำหรับโชว์ Stat แนะนำ (ไม่ได้ใช้คำนวณ)
+        const configStats = [
+            { name: 'Stun',    atk: 'STR', defC: 'VIT+AGI', defT: 'VIT' },
+            { name: 'Blind',   atk: 'STR', defC: 'INT+DEX', defT: 'INT' },
+            { name: 'Curse',   atk: 'STR', defC: 'INT+DEX', defT: 'INT' },
+            { name: 'Fear',    atk: 'DEX', defC: 'INT+LUK', defT: 'INT' },
+            { name: 'Sleep',   atk: 'DEX', defC: 'INT+LUK', defT: 'INT' },
+            { name: 'Silence', atk: 'DEX', defC: 'VIT+STR', defT: 'VIT' },
+            { name: 'Freeze',  atk: 'INT', defC: 'INT+DEX', defT: 'INT' },
+            { name: 'Bleed',   atk: 'INT', defC: 'VIT+INT', defT: 'VIT' },
+            { name: 'Burn',    atk: 'INT', defC: 'VIT+AGI', defT: 'VIT' },
+            { name: 'Stone',   atk: 'INT', defC: 'INT+DEX', defT: 'INT' },
+            { name: 'Poison',  atk: 'LUK', defC: 'VIT+INT', defT: 'VIT' },
+            { name: 'Snare',   atk: 'AGI', defC: 'VIT+STR', defT: 'VIT' }
+        ];
 
-        // Initialize Dropdown
-        config.forEach(c => {
+        // สร้าง Dropdown
+        configStats.forEach(c => {
             const opt = document.createElement('option');
             opt.value = c.name;
             opt.innerText = c.name;
             select.appendChild(opt);
         });
 
+        // ฟังก์ชันอัปเดต Label
         function updateLabels() {
-            const currentName = select.value;
-            const data = config.find(c => c.name === currentName);
-            labels.atk.innerText = data.atk;
-            labels.defC.innerText = data.defC;
-            labels.defT.innerText = data.defT;
+            const data = configStats.find(c => c.name === select.value);
+            if(data) {
+                document.getElementById('lbl_atk_stat').innerText = data.atk;
+                document.getElementById('lbl_def_chance').innerText = data.defC;
+                document.getElementById('lbl_def_time').innerText = data.defT;
+            }
         }
 
-        // --- ฟังก์ชันใหม่: ส่งค่าไปคำนวณที่ Server ---
-        let timeoutId;
+        // ฟังก์ชันส่งค่าไปคำนวณ
+        let timeout = null;
         function calculate() {
-            // แสดงสถานะกำลังโหลด
-            results.finalTime.innerHTML = '...'; 
-            results.finalTime.style.opacity = 0.5;
-
-            // หน่วงเวลาเล็กน้อยเพื่อไม่ให้ส่งข้อมูลรัวเกินไป (Debounce)
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => {
-                fetchData();
-            }, 500); 
+            results.finalTime.innerHTML = '...';
+            
+            if(timeout) clearTimeout(timeout);
+            timeout = setTimeout(callServer, 500); // รอ 0.5 วิค่อยส่ง
         }
 
-        function fetchData() {
-            const params = new URLSearchParams({
-                status: select.value,
-                base: inputs.base.value,
-                time: inputs.time.value,
-                atkStat: inputs.atkStat.value,
-                statusAtk: inputs.statusAtk.value,
-                ccAtk: inputs.ccAtk.value,
-                defChance: inputs.defChance.value,
-                defTime: inputs.defTime.value,
-                res: inputs.res.value,
-                ccRes: inputs.ccRes.value
-            });
+        function callServer() {
+            // เตรียมข้อมูลส่ง
+            const params = new URLSearchParams();
+            params.append('status', select.value);
+            for(let key in inputs) {
+                params.append(key, inputs[key].value);
+            }
 
+            // ยิงไปที่ Server
             fetch(API_URL + "?" + params.toString())
-            .then(response => response.json())
-            .then(data => {
-                // รับค่าผลลัพธ์มาแสดง
-                results.chance.innerHTML = data.chance.toFixed(2) + '<span class="unit">%</span>';
-                results.durPct.innerHTML = (data.durPct * 100).toFixed(0) + '<span class="unit">%</span>';
-                results.finalTime.innerHTML = data.finalTime.toFixed(2) + '<span class="unit">s</span>';
-                
-                if(data.chance === 0) results.finalTime.style.opacity = 0.3;
-                else results.finalTime.style.opacity = 1;
-            })
-            .catch(err => {
-                console.error("Error:", err);
-                results.finalTime.innerHTML = "Error";
-            });
+                .then(res => res.json())
+                .then(data => {
+                    results.chance.innerHTML = parseFloat(data.chance).toFixed(2) + '<span class="unit">%</span>';
+                    results.durPct.innerHTML = (parseFloat(data.durPct)*100).toFixed(0) + '<span class="unit">%</span>';
+                    results.finalTime.innerHTML = parseFloat(data.finalTime).toFixed(2) + '<span class="unit">s</span>';
+                })
+                .catch(err => {
+                    console.error("เกิดข้อผิดพลาด:", err);
+                    results.finalTime.innerHTML = "Error";
+                });
         }
 
-        // Event Listeners
-        select.addEventListener('change', () => {
-            updateLabels();
-            calculate();
+        // ผูก Event
+        select.addEventListener('change', () => { updateLabels(); calculate(); });
+        Object.values(inputs).forEach(input => {
+            input.addEventListener('input', calculate);
         });
 
-        Object.values(inputs).forEach(inp => {
-            inp.addEventListener('input', calculate);
-        });
-
-        // Init
+        // เริ่มต้นทำงาน
         updateLabels();
         calculate();
 
     })();
 </script>
 
+</body>
+</html>
