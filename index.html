@@ -1,19 +1,484 @@
-<div class="footer">Status Calculator - Protected</div>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROMC CC Calculator by Papaza007</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --border: #334155;
+            
+            /* Status Colors */
+            --c-atk: #ef4444;
+            --c-def: #3b82f6;
+            --c-res: #10b981;
+            --c-gold: #f59e0b;
+        }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+        }
+
+        .dashboard {
+            background: var(--bg-card);
+            width: 100%;
+            max-width: 900px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+            padding: 30px;
+        }
+
+        /* --- Header & Selector --- */
+        .header-section {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+        
+        h1 { margin: 0 0 10px 0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .select-wrapper {
+            position: relative;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 20px;
+            background: var(--bg-input);
+            color: #fff;
+            border: 2px solid var(--accent);
+            border-radius: 10px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1.1rem;
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+        }
+        
+        .select-wrapper::after {
+            content: '▼';
+            font-size: 0.8rem;
+            color: var(--accent);
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        /* --- Grid Layout --- */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-layout { grid-template-columns: 1fr; }
+        }
+
+        /* --- Cards --- */
+        .card {
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .card-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .t-atk { color: var(--c-atk); border-color: var(--c-atk); }
+        .t-def { color: var(--c-def); border-color: var(--c-def); }
+        .t-base { color: var(--text-muted); border-color: var(--text-muted); }
+
+        /* --- Input Groups --- */
+        .input-group {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .input-group label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            flex: 1;
+        }
+
+        .stat-badge {
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #334155;
+            color: #fff;
+            margin-right: 10px;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        input[type="number"] {
+            width: 80px;
+            background: var(--bg-body);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        /* --- Result Section --- */
+        .result-section {
+            margin-top: 30px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .res-box h3 {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .res-value {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin: 5px 0 0 0;
+            line-height: 1;
+        }
+
+        .v-chance { color: var(--c-gold); text-shadow: 0 0 15px rgba(245, 158, 11, 0.2); }
+        .v-duration { color: var(--c-def); }
+        .v-time { color: var(--c-res); text-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
+        
+        .unit { font-size: 1rem; color: var(--text-muted); font-weight: 400; }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #475569;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+<div class="dashboard">
+    <div class="header-section">
+        <h1>CC Calculator by Papaza007</h1>
+        <div class="select-wrapper">
+            <select id="statusSelect">
+                </select>
+        </div>
+    </div>
+
+    <div class="grid-layout">
+        
+        <div class="col-left">
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-title t-base">Base Information</div>
+                <div class="input-group">
+                    <label>โอกาสติดพื้นฐาน (Base Chance)</label>
+                    <input type="number" id="inp_base" value="50" placeholder="%">
+                </div>
+                <div class="input-group">
+                    <label>เวลาพื้นฐาน (Base Time)</label>
+                    <input type="number" id="inp_time" value="10" placeholder="Sec">
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title t-atk">
+                    Attacker (ฝ่ายโจมตี)
+                    <span id="lbl_atk_stat" class="stat-badge" style="background:var(--c-atk)">STR</span>
+                </div>
+                <div class="input-group">
+                    <label>ค่า Stat ผู้โจมตี (Stat Value)</label>
+                    <input type="number" id="inp_atk_stat" value="0">
+                </div>
+                <div class="input-group">
+                    <label>Status Atk% (เช่น การ์ดผีผ้าดาว จะบวกอีก 25%)</label>
+                    <input type="number" id="inp_status_atk" value="0">
+                </div>
+                <div class="input-group">
+                    <label>Special/CC Atk %</label>
+                    <input type="number" id="inp_cc_atk" value="0">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-right">
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-title t-def">
+                    Defender (ฝ่ายป้องกัน)
+                </div>
+                <div class="input-group">
+                    <label>Statกันติด ใส่ผลรวมของ-><span id="lbl_def_chance" class="stat-badge">VIT+LUK</span></label>
+                    <input type="number" id="inp_def_chance" value="0">
+                </div>
+                <div class="input-group">
+                    <label>Statลดเวลา ใส่ผลรวมของ-><span id="lbl_def_time" class="stat-badge">VIT</span></label>
+                    <input type="number" id="inp_def_time" value="0">
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title t-def" style="border-color: var(--c-res); color: var(--c-res);">
+                    Resistance (จากของสวมใส่ , การ์ด , สกิลป้องกัน)
+                </div>
+                <div class="input-group">
+                    <label>Resist % (กันสถานะ)</label>
+                    <input type="number" id="inp_res" value="0">
+                </div>
+                <div class="input-group">
+                    <label>CC Resist% (เช่น จากการ์ดหมายาย)</label>
+                    <input type="number" id="inp_cc_res" value="0">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="result-section">
+        <div class="res-box">
+            <h3>Chance</h3>
+            <div class="res-value v-chance" id="res_chance">0<span class="unit">%</span></div>
+        </div>
+        <div class="res-box">
+            <h3>Duration</h3>
+            <div class="res-value v-duration" id="res_duration_pct">100<span class="unit">%</span></div>
+        </div>
+        <div class="res-box">
+            <h3>Final Time</h3>
+            <div class="res-value v-time" id="res_final_time">0.00<span class="unit">s</span></div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        Powered by Papaza007
+    </div>
+
 </div>
 
 <script>
-    // 1. นำรหัส Base64 ที่ได้จากขั้นตอนที่ 2 มาวางแทนที่ตรง "วางรหัสยาวๆตรงนี้"
-    var secureCode = "Lyog4LmC4LiE4LmJ4LiU4Liq4Li54LiV4Lij4LiE4Liz4LiZ4Lin4LiT4LiV4LmJ4LiZ4LiJ4Lia4Lix4LiaICovCihmdW5jdGlvbigpIHsKICAgIC8vIOC4geC4seC4meC4hOC4peC4tOC4geC4guC4p+C4sgogICAgZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignY29udGV4dG1lbnUnLCBlID0+IGUucHJldmVudERlZmF1bHQoKSk7CiAgICBkb2N1bWVudC5vbmtleWRvd24gPSBmdW5jdGlvbihlKSB7IGlmKGUua2V5Q29kZSA9PSAxMjMpIHJldHVybiBmYWxzZTsgfTsKCiAgICBjb25zdCBjb25maWcgPSBbCiAgICAgICAgeyBuYW1lOiAnU3R1bicsICAgIGF0azogJ1NUUicsIGRlZkM6ICdWSVQrQUdJJywgZGVmVDogJ1ZJVCcgfSwKICAgICAgICB7IG5hbWU6ICdCbGluZCcsICAgYXRrOiAnU1RSJywgZGVmQzogJ0lOVCtERVgnLCBkZWZUOiAnSU5UJyB9LAogICAgICAgIHsgbmFtZTogJ0N1cnNlJywgICBhdGs6ICdTVFInLCBkZWZDOiAnSU5UK0RFWCcsIGRlZlQ6ICdJTlQnIH0sCiAgICAgICAgeyBuYW1lOiAnRmVhcicsICAgIGF0azogJ0RFWCcsIGRlZkM6ICdJTlQrTFVLJywgZGVmVDogJ0lOVCcgfSwKICAgICAgICB7IG5hbWU6ICdTbGVlcCcsICAgYXRrOiAnREVYJywgZGVmQzogJ0lOVCtMVUsnLCBkZWZUOiAnSU5UJyB9LAogICAgICAgIHsgbmFtZTogJ1NpbGVuY2UnLCBhdGs6ICdERVgnLCBkZWZDOiAnVklUK1NUUicsIGRlZlQ6ICdWSVQnIH0sCiAgICAgICAgeyBuYW1lOiAnRnJlZXplJywgIGF0azogJ0lOVCcsIGRlZkM6ICdJTlQrREVYJywgZGVmVDogJ0lOVCcgfSwKICAgICAgICB7IG5hbWU6ICdCbGVlZCcsICAgYXRrOiAnSU5UJywgZGVmQzogJ1ZJVCtJTlQnLCBkZWZUOiAnVklUJyB9LAogICAgICAgIHsgbmFtZTogJ0J1cm4nLCAgICBhdGs6ICdJTlQnLCBkZWZDOiAnVklUK0FHSScsIGRlZlQ6ICdWSVQnIH0sCiAgICAgICAgeyBuYW1lOiAnU3RvbmUnLCAgIGF0azogJ0lOVCcsIGRlZkM6ICdJTlQrREVYJywgZGVmVDogJ0lOVCcgfSwKICAgICAgICB7IG5hbWU6ICdQb2lzb24nLCAgYXRrOiAnTFVLJywgZGVmQzogJ1ZJVCtJTlQnLCBkZWZUOiAnVklUJyB9LAogICAgICAgIHsgbmFtZTogJ1NuYXJlJywgICBhdGs6ICdBR0knLCBkZWZDOiAnVklUK1NUUicsIGRlZlQ6ICdWSVQnIH0KICAgIF07CgogICAgY29uc3Qgc2VsZWN0ID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3N0YXR1c1NlbGVjdCcpOwogICAgY29uc3QgbGFiZWxzID0gewogICAgICAgIGF0azogZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2xibF9hdGtfc3RhdCcpLAogICAgICAgIGRlZkM6IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdsYmxfZGVmX2NoYW5jZScpLAogICAgICAgIGRlZlQ6IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdsYmxfZGVmX3RpbWUnKQogICAgfTsKICAgIGNvbnN0IGlucHV0cyA9IHsKICAgICAgICBiYXNlOiBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnaW5wX2Jhc2UnKSwKICAgICAgICB0aW1lOiBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnaW5wX3RpbWUnKSwKICAgICAgICBhdGtTdGF0OiBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnaW5wX2F0a19zdGF0JyksCiAgICAgICAgc3RhdHVzQXRrOiBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnaW5wX3N0YXR1c19hdGsnKSwKICAgICAgICBjY0F0azogZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2lucF9jY19hdGsnKSwKICAgICAgICBkZWZDaGFuY2U6IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdpbnBfZGVmX2NoYW5jZScpLAogICAgICAgIGRlZlRpbWU6IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdpbnBfZGVmX3RpbWUnKSwKICAgICAgICByZXM6IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdpbnBfcmVzJyksCiAgICAgICAgY2NSZXM6IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdpbnBfY2NfcmVzJykKICAgIH07CiAgICBjb25zdCByZXN1bHRzID0gewogICAgICAgIGNoYW5jZTogZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3Jlc19jaGFuY2UnKSwKICAgICAgICBkdXJQY3Q6IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdyZXNfZHVyYXRpb25fcGN0JyksCiAgICAgICAgZmluYWxUaW1lOiBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncmVzX2ZpbmFsX3RpbWUnKQogICAgfTsKCiAgICBjb25maWcuZm9yRWFjaChjID0+IHsKICAgICAgICBjb25zdCBvcHQgPSBkb2N1bWVudC5jcmVhdGVFbGVtZW50KCdvcHRpb24nKTsKICAgICAgICBvcHQudmFsdWUgPSBjLm5hbWU7CiAgICAgICAgb3B0LmlubmVyVGV4dCA9IGMubmFtZTsKICAgICAgICBzZWxlY3QuYXBwZW5kQ2hpbGQob3B0KTsKICAgIH0pOwoKICAgIGZ1bmN0aW9uIHVwZGF0ZUxhYmVscygpIHsKICAgICAgICBjb25zdCBjdXJyZW50TmFtZSA9IHNlbGVjdC52YWx1ZTsKICAgICAgICBjb25zdCBkYXRhID0gY29uZmlnLmZpbmQoYyA9PiBjLm5hbWUgPT09IGN1cnJlbnROYW1lKTsKICAgICAgICBsYWJlbHMuYXRrLmlubmVyVGV4dCA9IGRhdGEuYXRrOwogICAgICAgIGxhYmVscy5kZWZDLmlubmVyVGV4dCA9IGRhdGEuZGVmQzsKICAgICAgICBsYWJlbHMuZGVmVC5pbm5lclRleHQgPSBkYXRhLmRlZlQ7CiAgICB9CgogICAgZnVuY3Rpb24gY2FsY3VsYXRlKCkgewogICAgICAgIGNvbnN0IHN0YXR1c05hbWUgPSBzZWxlY3QudmFsdWU7CiAgICAgICAgY29uc3QgZ2V0VmFsID0gKGVsKSA9PiBwYXJzZUZsb2F0KGVsLnZhbHVlKSB8fCAwOwogICAgICAgIAogICAgICAgIGNvbnN0IEIzID0gZ2V0VmFsKGlucHV0cy5iYXNlKTsKICAgICAgICBjb25zdCBDMyA9IGdldFZhbChpbnB1dHMudGltZSk7CiAgICAgICAgY29uc3QgRTMgPSBnZXRWYWwoaW5wdXRzLmF0a1N0YXQpOwogICAgICAgIGNvbnN0IEYzID0gZ2V0VmFsKGlucHV0cy5zdGF0dXNBdGspOwogICAgICAgIGNvbnN0IEczID0gZ2V0VmFsKGlucHV0cy5jY0F0ayk7CiAgICAgICAgY29uc3QgSTMgPSBnZXRWYWwoaW5wdXRzLmRlZkNoYW5jZSk7CiAgICAgICAgY29uc3QgSzMgPSBnZXRWYWwoaW5wdXRzLmRlZlRpbWUpOwogICAgICAgIGNvbnN0IEwzID0gZ2V0VmFsKGlucHV0cy5yZXMpOwogICAgICAgIGNvbnN0IE0zID0gZ2V0VmFsKGlucHV0cy5jY1Jlcyk7CgogICAgICAgIGxldCBxX2xpbWl0MSA9IChbJ0JsaW5kJywgJ0N1cnNlJywgJ0JsZWVkJ10uaW5jbHVkZXMoc3RhdHVzTmFtZSkpID8gMSA6IDAuODsKICAgICAgICBsZXQgcV9wb2lzb25fZmFjdG9yID0gKHN0YXR1c05hbWUgPT09ICdQb2lzb24nKSA/IDAuMiA6IDAuMzsKICAgICAgICBsZXQgcV9saW1pdDIgPSAoRTMgKiBxX3BvaXNvbl9mYWN0b3IpIC8gMTAwOwogICAgICAgIGNvbnN0IFEzID0gTWF0aC5taW4ocV9saW1pdDEsIHFfbGltaXQyKTsKCiAgICAgICAgbGV0IG5fcGFydDEgPSBCMyAqICgxICsgKEYzLzEwMCkgLSAoTDMvMTAwKSk7CiAgICAgICAgbGV0IG5fbGltaXRBOwogICAgICAgIGlmIChbJ0JsaW5kJywgJ0N1cnNlJywgJ1NpbGVuY2UnXS5pbmNsdWRlcyhzdGF0dXNOYW1lKSkgbl9saW1pdEEgPSAxOwogICAgICAgIGVsc2UgaWYgKFsnQmxlZWQnLCAnQnVybicsICdQb2lzb24nXS5pbmNsdWRlcyhzdGF0dXNOYW1lKSkgbl9saW1pdEEgPSAwLjg7CiAgICAgICAgZWxzZSBuX2xpbWl0QSA9IDAuNjsKICAgICAgICBsZXQgbl9ib251c0FfZmFjdG9yID0gKFsnU3R1bicsICdTbGVlcCcsICdGcmVlemUnLCAnU3RvbmUnLCAnU25hcmUnXS5pbmNsdWRlcyhzdGF0dXNOYW1lKSkgPyAwLjIgOiAwLjM7CiAgICAgICAgbGV0IG5fYm9udXNBID0gKEUzICogbl9ib251c0FfZmFjdG9yKSAvIDEwMDsKICAgICAgICBsZXQgbl9tYWx1c0FfZmFjdG9yID0gKFsnQ3Vyc2UnLCAnU2lsZW5jZSddLmluY2x1ZGVzKHN0YXR1c05hbWUpKSA/IDAuMyA6IDAuMjsKICAgICAgICBsZXQgbl9tYWx1c0EgPSAoSTMgKiBuX21hbHVzQV9mYWN0b3IpIC8gMTAwOwogICAgICAgIGxldCBuX3Rlcm0yID0gMSArIE1hdGgubWluKG5fbGltaXRBLCBuX2JvbnVzQSkgLSBNYXRoLm1pbigxLCBuX21hbHVzQSk7CiAgICAgICAgY29uc3QgUmVzdWx0TiA9IE1hdGgubWF4KDAsIG5fcGFydDEgKiBuX3Rlcm0yKTsKCiAgICAgICAgbGV0IG9fZ2VhciA9IDEgKyAoKEczIC0gTTMpIC8gMTAwKTsKICAgICAgICBsZXQgb19zdGF0X3JlZHVjID0gTWF0aC5taW4oMSwgKEszICogMC40KSAvIDEwMCk7CiAgICAgICAgbGV0IG9fc3RhdF9tb2QgPSAxICsgKFEzIC0gb19zdGF0X3JlZHVjKTsKICAgICAgICBsZXQgb19hdGtfcmVzX21vZCA9IDEgKyAoKEYzIC0gTDMpIC8gMTAwKTsKICAgICAgICBjb25zdCBSZXN1bHRPID0gTWF0aC5taW4oMSwgTWF0aC5tYXgoMCwgMSAqIG9fZ2VhciAqIG9fc3RhdF9tb2QgKiBvX2F0a19yZXNfbW9kKSk7CiAgICAgICAgY29uc3QgUmVzdWx0UCA9IFJlc3VsdE8gKiBDMzsKCiAgICAgICAgcmVzdWx0cy5jaGFuY2UuaW5uZXJIVE1MID0gUmVzdWx0Ti50b0ZpeGVkKDIpICsgJzxzcGFuIGNsYXNzPSJ1bml0Ij4lPC9zcGFuPic7CiAgICAgICAgcmVzdWx0cy5kdXJQY3QuaW5uZXJIVE1MID0gKFJlc3VsdE8gKiAxMDApLnRvRml4ZWQoMCkgKyAnPHNwYW4gY2xhc3M9InVuaXQiPiU8L3NwYW4+JzsKICAgICAgICByZXN1bHRzLmZpbmFsVGltZS5pbm5lckhUTUwgPSBSZXN1bHRQLnRvRml4ZWQoMikgKyAnPHNwYW4gY2xhc3M9InVuaXQiPnM8L3NwYW4+JzsKICAgICAgICAKICAgICAgICBpZihSZXN1bHROID09PSAwKSByZXN1bHRzLmZpbmFsVGltZS5zdHlsZS5vcGFjaXR5ID0gMC4zOwogICAgICAgIGVsc2UgcmVzdWx0cy5maW5hbFRpbWUuc3R5bGUub3BhY2l0eSA9IDE7CiAgICB9CgogICAgc2VsZWN0LmFkZEV2ZW50TGlzdGVuZXIoJ2NoYW5nZScsICgpID0+IHsgdXBkYXRlTGFiZWxzKCk7IGNhbGN1bGF0ZSgpOyB9KTsKICAgIE9iamVjdC52YWx1ZXMoaW5wdXRzKS5mb3JFYWNoKGlucCA9PiB7IGlucC5hZGRFdmVudExpc3RlbmVyKCdpbnB1dCcsIGNhbGN1bGF0ZSk7IH0pOwogICAgdXBkYXRlTGFiZWxzKCk7CiAgICBjYWxjdWxhdGUoKTsKfSkoKTs=";
+    (function(){
+        // Security
+        document.onkeydown = function(e) {
+            if(e.keyCode == 123) return false;
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
+            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+        };
 
-    // 2. คำสั่งแปลงรหัสกลับเป็นโค้ดและทำงานทันที
-    // (คนทั่วไปอ่านโค้ดไม่ออก เพราะมันถูกเข้ารหัสไว้ในตัวแปร secureCode)
-    try {
-        eval(decodeURIComponent(escape(window.atob(secureCode))));
-    } catch (e) {
-        console.error("Security Check Failed");
-    }
+        // Data Config
+        const config = [
+            { name: 'Stun',    atk: 'STR', defC: 'VIT+AGI', defT: 'VIT' },
+            { name: 'Blind',   atk: 'STR', defC: 'INT+DEX', defT: 'INT' },
+            { name: 'Curse',   atk: 'STR', defC: 'INT+DEX', defT: 'INT' },
+            { name: 'Fear',    atk: 'DEX', defC: 'INT+LUK', defT: 'INT' },
+            { name: 'Sleep',   atk: 'DEX', defC: 'INT+LUK', defT: 'INT' },
+            { name: 'Silence', atk: 'DEX', defC: 'VIT+STR', defT: 'VIT' },
+            { name: 'Freeze',  atk: 'INT', defC: 'INT+DEX', defT: 'INT' },
+            { name: 'Bleed',   atk: 'INT', defC: 'VIT+INT', defT: 'VIT' },
+            { name: 'Burn',    atk: 'INT', defC: 'VIT+AGI', defT: 'VIT' },
+            { name: 'Stone',   atk: 'INT', defC: 'INT+DEX', defT: 'INT' },
+            { name: 'Poison',  atk: 'LUK', defC: 'VIT+INT', defT: 'VIT' },
+            { name: 'Snare',   atk: 'AGI', defC: 'VIT+STR', defT: 'VIT' }
+        ];
+
+        // UI References
+        const select = document.getElementById('statusSelect');
+        const labels = {
+            atk: document.getElementById('lbl_atk_stat'),
+            defC: document.getElementById('lbl_def_chance'),
+            defT: document.getElementById('lbl_def_time')
+        };
+        const inputs = {
+            base: document.getElementById('inp_base'),
+            time: document.getElementById('inp_time'),
+            atkStat: document.getElementById('inp_atk_stat'),
+            statusAtk: document.getElementById('inp_status_atk'),
+            ccAtk: document.getElementById('inp_cc_atk'),
+            defChance: document.getElementById('inp_def_chance'),
+            defTime: document.getElementById('inp_def_time'),
+            res: document.getElementById('inp_res'),
+            ccRes: document.getElementById('inp_cc_res')
+        };
+        const results = {
+            chance: document.getElementById('res_chance'),
+            durPct: document.getElementById('res_duration_pct'),
+            finalTime: document.getElementById('res_final_time')
+        };
+
+        // 1. Initialize Dropdown
+        config.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.name;
+            opt.innerText = c.name;
+            select.appendChild(opt);
+        });
+
+        // 2. Logic to Update Labels
+        function updateLabels() {
+            const currentName = select.value;
+            const data = config.find(c => c.name === currentName);
+            
+            labels.atk.innerText = data.atk;
+            labels.defC.innerText = data.defC;
+            labels.defT.innerText = data.defT;
+        }
+
+        // 3. Calculation Logic (The Formulas)
+        function calculate() {
+            const statusName = select.value;
+            const getVal = (el) => parseFloat(el.value) || 0;
+
+            // Gather Inputs (Mapping to Excel Columns)
+            // B3 = Base Chance
+            // C3 = Base Time
+            // E3 = Atk Stat Value
+            // F3 = Status Atk %
+            // G3 = CC Atk %
+            // I3 = Def Chance Stat
+            // K3 = Def Time Stat
+            // L3 = Resist %
+            // M3 = CC Res %
+            
+            const B3 = getVal(inputs.base);
+            const C3 = getVal(inputs.time);
+            const E3 = getVal(inputs.atkStat);
+            const F3 = getVal(inputs.statusAtk);
+            const G3 = getVal(inputs.ccAtk);
+            const I3 = getVal(inputs.defChance);
+            const K3 = getVal(inputs.defTime);
+            const L3 = getVal(inputs.res);
+            const M3 = getVal(inputs.ccRes);
+
+            // --- FORMULA Q (Hidden Factor) ---
+            let q_limit1;
+            if (['Blind', 'Curse', 'Bleed'].includes(statusName)) q_limit1 = 1;
+            else q_limit1 = 0.8;
+
+            let q_poison_factor = (statusName === 'Poison') ? 0.2 : 0.3;
+            let q_limit2 = (E3 * q_poison_factor) / 100;
+
+            const Q3 = Math.min(q_limit1, q_limit2);
+
+            // --- FORMULA N (Chance) ---
+            // Formula: MAX(0, B3 * (1 + F3 - L3) * (1 + MIN(LimitA, BonusA) - MIN(1, MalusA)))
+            
+            let n_part1 = B3 * (1 + (F3/100) - (L3/100));
+
+            let n_limitA;
+            if (['Blind', 'Curse', 'Silence'].includes(statusName)) n_limitA = 1;
+            else if (['Bleed', 'Burn', 'Poison'].includes(statusName)) n_limitA = 0.8;
+            else n_limitA = 0.6;
+
+            let n_bonusA_factor;
+            if (['Stun', 'Sleep', 'Freeze', 'Stone', 'Snare'].includes(statusName)) n_bonusA_factor = 0.2;
+            else n_bonusA_factor = 0.3;
+            let n_bonusA = (E3 * n_bonusA_factor) / 100;
+
+            let n_malusA_factor;
+            if (['Curse', 'Silence'].includes(statusName)) n_malusA_factor = 0.3;
+            else n_malusA_factor = 0.2;
+            let n_malusA = (I3 * n_malusA_factor) / 100;
+
+            let n_term2 = 1 + Math.min(n_limitA, n_bonusA) - Math.min(1, n_malusA);
+
+            const ResultN = Math.max(0, n_part1 * n_term2);
+
+            // --- FORMULA O (Duration %) ---
+            // New Formula: =MIN(1, MAX(0, 1 * (1 + (G3 - M3)) * (1 + (Q3 - MIN(1, (K3 * 0.4) / 100))) * (1 + (F3 - L3))))
+            
+            // Term 1: Gear Modifier (G3 - M3)
+            let o_gear = 1 + ((G3 - M3) / 100);
+            
+            // Term 2: Stat Modifier (Q3 - DefTimeStat)
+            let o_stat_reduc = Math.min(1, (K3 * 0.4) / 100);
+            let o_stat_mod = 1 + (Q3 - o_stat_reduc);
+            
+            // Term 3: Atk/Resist Modifier (F3 - L3) -> **NEW**
+            let o_atk_res_mod = 1 + ((F3 - L3) / 100);
+
+            // Calculate O
+            const ResultO = Math.min(1, Math.max(0, 1 * o_gear * o_stat_mod * o_atk_res_mod));
+
+            // --- FORMULA P (Final Time) ---
+            const ResultP = ResultO * C3;
+
+            // --- Display ---
+            results.chance.innerHTML = ResultN.toFixed(2) + '<span class="unit">%</span>';
+            results.durPct.innerHTML = (ResultO * 100).toFixed(0) + '<span class="unit">%</span>';
+            results.finalTime.innerHTML = ResultP.toFixed(2) + '<span class="unit">s</span>';
+            
+            // Dim if zero chance
+            if(ResultN === 0) results.finalTime.style.opacity = 0.3;
+            else results.finalTime.style.opacity = 1;
+        }
+
+        // Event Listeners
+        select.addEventListener('change', () => {
+            updateLabels();
+            calculate();
+        });
+
+        Object.values(inputs).forEach(inp => {
+            inp.addEventListener('input', calculate);
+        });
+
+        // Init
+        updateLabels();
+        calculate();
+
+    })();
 </script>
 
 </body>
 </html>
-
