@@ -1,0 +1,14 @@
+[
+  { "name": "Stun",    "atk": "STR", "defC": "VIT+AGI", "defT": "VIT" },
+  { "name": "Blind",   "atk": "STR", "defC": "INT+DEX", "defT": "INT" },
+  { "name": "Curse",   "atk": "STR", "defC": "INT+DEX", "defT": "INT" },
+  { "name": "Fear",    "atk": "DEX", "defC": "INT+LUK", "defT": "INT" },
+  { "name": "Sleep",   "atk": "DEX", "defC": "INT+LUK", "defT": "INT" },
+  { "name": "Silence", "atk": "DEX", "defC": "VIT+STR", "defT": "VIT" },
+  { "name": "Freeze",  "atk": "INT", "defC": "INT+DEX", "defT": "INT" },
+  { "name": "Bleed",   "atk": "INT", "defC": "VIT+INT", "defT": "VIT" },
+  { "name": "Burn",    "atk": "INT", "defC": "VIT+AGI", "defT": "VIT" },
+  { "name": "Stone",   "atk": "INT", "defC": "INT+DEX", "defT": "INT" },
+  { "name": "Poison",  "atk": "LUK", "defC": "VIT+INT", "defT": "VIT" },
+  { "name": "Snare",   "atk": "AGI", "defC": "VIT+STR", "defT": "VIT" }
+]
