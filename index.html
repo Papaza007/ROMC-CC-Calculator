@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROMC CC Calculator by Papaza007</title>
+    <title>ROMC CC Calculator - Member Only</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
@@ -34,8 +34,50 @@
             align-items: center;
             min-height: 100vh;
             user-select: none;
+            overflow: hidden; /* ป้องกันการเลื่อนตอน Login บัง */
         }
 
+        /* --- LOGIN OVERLAY STYLES (ส่วนที่เพิ่มมา) --- */
+        #login-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.98);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s;
+        }
+        .login-box {
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid var(--accent);
+            text-align: center;
+            box-shadow: 0 0 50px rgba(59, 130, 246, 0.3);
+            max-width: 400px;
+            width: 90%;
+        }
+        .discord-btn {
+            background-color: #5865F2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            margin-top: 20px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .discord-btn:hover { background-color: #4752C4; transform: scale(1.05); }
+        .loading-text { margin-top: 15px; color: var(--text-muted); display: none; }
+        .error-msg { color: var(--c-atk); margin-top: 15px; display: none; }
+
+        /* --- Original Styles --- */
         .dashboard {
             background: var(--bg-card);
             width: 100%;
@@ -44,181 +86,68 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             border: 1px solid var(--border);
             padding: 30px;
+            /* เบลอพื้นหลังถ้ายังไม่ Login */
+            filter: blur(5px); 
+            transition: filter 0.5s;
         }
 
-        /* --- Header & Selector --- */
-        .header-section {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 20px;
-        }
-        
+        /* เมื่อ Login ผ่าน Class นี้จะถูกเติม */
+        body.logged-in .dashboard { filter: none; }
+        body.logged-in #login-overlay { display: none; }
+
+        /* ... (คง CSS เดิมไว้ทั้งหมดด้านล่างนี้) ... */
+        .header-section { text-align: center; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
         h1 { margin: 0 0 10px 0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-        
-        .select-wrapper {
-            position: relative;
-            max-width: 300px;
-            margin: 0 auto;
-        }
-
-        select {
-            width: 100%;
-            padding: 12px 20px;
-            background: var(--bg-input);
-            color: #fff;
-            border: 2px solid var(--accent);
-            border-radius: 10px;
-            font-family: 'Kanit', sans-serif;
-            font-size: 1.1rem;
-            cursor: pointer;
-            outline: none;
-            appearance: none;
-        }
-        
-        .select-wrapper::after {
-            content: '▼';
-            font-size: 0.8rem;
-            color: var(--accent);
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            pointer-events: none;
-        }
-
-        /* --- Grid Layout --- */
-        .grid-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        @media (max-width: 768px) {
-            .grid-layout { grid-template-columns: 1fr; }
-        }
-
-        /* --- Cards --- */
-        .card {
-            background: rgba(0,0,0,0.2);
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid var(--border);
-        }
-        
-        .card-title {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            padding-bottom: 5px;
-            border-bottom: 2px solid;
-            display: flex;
-            justify-content: space-between;
-        }
-
+        .select-wrapper { position: relative; max-width: 300px; margin: 0 auto; }
+        select { width: 100%; padding: 12px 20px; background: var(--bg-input); color: #fff; border: 2px solid var(--accent); border-radius: 10px; font-family: 'Kanit', sans-serif; font-size: 1.1rem; cursor: pointer; outline: none; appearance: none; }
+        .select-wrapper::after { content: '▼'; font-size: 0.8rem; color: var(--accent); position: absolute; right: 15px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+        .grid-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .grid-layout { grid-template-columns: 1fr; } }
+        .card { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 20px; border: 1px solid var(--border); }
+        .card-title { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 15px; padding-bottom: 5px; border-bottom: 2px solid; display: flex; justify-content: space-between; }
         .t-atk { color: var(--c-atk); border-color: var(--c-atk); }
         .t-def { color: var(--c-def); border-color: var(--c-def); }
         .t-base { color: var(--text-muted); border-color: var(--text-muted); }
-
-        /* --- Input Groups --- */
-        .input-group {
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .input-group label {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            flex: 1;
-        }
-
-        .stat-badge {
-            font-size: 0.75rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            background: #334155;
-            color: #fff;
-            margin-right: 10px;
-            min-width: 40px;
-            text-align: center;
-        }
-
-        input[type="number"] {
-            width: 80px;
-            background: var(--bg-body);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            padding: 8px;
-            border-radius: 6px;
-            text-align: center;
-            font-family: 'Kanit', sans-serif;
-            font-size: 1rem;
-            transition: all 0.2s;
-        }
-        input[type="number"]:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
-
-        /* --- Result Section --- */
-        .result-section {
-            margin-top: 30px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 15px;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            text-align: center;
-            border: 1px solid var(--border);
-        }
-
-        .res-box h3 {
-            margin: 0;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .res-value {
-            font-size: 2.5rem;
-            font-weight: 600;
-            margin: 5px 0 0 0;
-            line-height: 1;
-        }
-
+        .input-group { margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; }
+        .input-group label { font-size: 0.9rem; color: var(--text-muted); flex: 1; }
+        .stat-badge { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; background: #334155; color: #fff; margin-right: 10px; min-width: 40px; text-align: center; }
+        input[type="number"] { width: 80px; background: var(--bg-body); border: 1px solid var(--border); color: var(--text-main); padding: 8px; border-radius: 6px; text-align: center; font-family: 'Kanit', sans-serif; font-size: 1rem; transition: all 0.2s; }
+        input[type="number"]:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+        .result-section { margin-top: 30px; background: rgba(0,0,0,0.3); border-radius: 15px; padding: 20px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center; border: 1px solid var(--border); }
+        .res-box h3 { margin: 0; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; }
+        .res-value { font-size: 2.5rem; font-weight: 600; margin: 5px 0 0 0; line-height: 1; }
         .v-chance { color: var(--c-gold); text-shadow: 0 0 15px rgba(245, 158, 11, 0.2); }
         .v-duration { color: var(--c-def); }
         .v-time { color: var(--c-res); text-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
-        
         .unit { font-size: 1rem; color: var(--text-muted); font-weight: 400; }
-
-        .footer {
-            margin-top: 20px;
-            text-align: center;
-            font-size: 0.8rem;
-            color: #475569;
-        }
+        .footer { margin-top: 20px; text-align: center; font-size: 0.8rem; color: #475569; }
     </style>
 </head>
 <body oncontextmenu="return false;">
+
+<div id="login-overlay">
+    <div class="login-box">
+        <h2 style="margin-top:0;">Member Access Only</h2>
+        <p style="color: var(--text-muted);">ระบบสงวนสิทธิ์เฉพาะสมาชิก Discord Server เท่านั้น</p>
+        
+        <button id="btn-login" class="discord-btn" onclick="loginWithDiscord()">
+            Login with Discord
+        </button>
+        
+        <div id="loading" class="loading-text">กำลังตรวจสอบสิทธิ์...</div>
+        <div id="error-msg" class="error-msg"></div>
+    </div>
+</div>
 
 <div class="dashboard">
     <div class="header-section">
         <h1>CC Calculator by Papaza007</h1>
         <div class="select-wrapper">
-            <select id="statusSelect">
-                </select>
+            <select id="statusSelect"></select>
         </div>
     </div>
 
     <div class="grid-layout">
-        
         <div class="col-left">
             <div class="card" style="margin-bottom: 20px;">
                 <div class="card-title t-base">Base Information</div>
@@ -254,9 +183,7 @@
 
         <div class="col-right">
             <div class="card" style="margin-bottom: 20px;">
-                <div class="card-title t-def">
-                    Defender (ฝ่ายป้องกัน)
-                </div>
+                <div class="card-title t-def">Defender (ฝ่ายป้องกัน)</div>
                 <div class="input-group">
                     <label>Statกันติด ใส่ผลรวมของ-><span id="lbl_def_chance" class="stat-badge">VIT+LUK</span></label>
                     <input type="number" id="inp_def_chance" value="0">
@@ -281,7 +208,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 
     <div class="result-section">
@@ -299,18 +225,78 @@
         </div>
     </div>
     
-    <div class="footer">
-        Powered by Papaza007
-    </div>
-
+    <div class="footer">Powered by Papaza007</div>
 </div>
 
 <script>
+    // ==========================================
+    // 1. ส่วนตั้งค่า DISCORD LOGIN (แก้ไขตรงนี้)
+    // ==========================================
+    const DISCORD_CLIENT_ID = "1473502517437534460"; // เอาไอดีจาก Discord Developer Portal มาใส่
+    const DISCORD_REDIRECT_URI = "https://papaza007.github.io/ROMC-CC-Calculator/"; // ใส่ URL ของหน้าเว็บนี้ (ต้องตรงกับใน Portal)
+    const REQUIRED_GUILD_ID = "1208098247730528256"; // ใส่ ID ของ Server Discord ที่อนุญาตให้เข้า
+    // ==========================================
+
+    // ฟังก์ชัน Login
+    function loginWithDiscord() {
+        // สร้าง URL สำหรับ Login
+        const scope = encodeURIComponent("identify guilds");
+        const url = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(DISCORD_REDIRECT_URI)}&response_type=token&scope=${scope}`;
+        window.location.href = url;
+    }
+
+    // ฟังก์ชันตรวจสอบสิทธิ์เมื่อโหลดหน้า
+    window.onload = () => {
+        // เช็คว่ามี Token กลับมาใน URL ไหม (หลัง Login เสร็จ)
+        const fragment = new URLSearchParams(window.location.hash.slice(1));
+        const accessToken = fragment.get('access_token');
+        const tokenType = fragment.get('token_type');
+
+        if (accessToken) {
+            // มี Token -> กำลังตรวจสอบกับ Discord
+            document.getElementById('btn-login').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+
+            // ยิง API ไปถาม Discord ว่าอยู่ Guild ไหนบ้าง
+            fetch('https://discord.com/api/users/@me/guilds', {
+                headers: { authorization: `${tokenType} ${accessToken}` }
+            })
+            .then(res => res.json())
+            .then(guilds => {
+                // เช็คว่ามี Guild ID ที่เราต้องการไหม
+                const isMember = guilds.some(g => g.id === REQUIRED_GUILD_ID);
+                
+                if (isMember) {
+                    // ผ่าน! -> ปลดล็อคหน้าจอ
+                    document.body.classList.add('logged-in');
+                    // ลบ Hash ใน URL ให้สวยงาม
+                    history.replaceState(null, null, ' ');
+                } else {
+                    // ไม่ผ่าน -> แจ้งเตือน
+                    showError("ขออภัย คุณไม่ได้เป็นสมาชิกใน Discord Server ที่กำหนด");
+                }
+            })
+            .catch(err => {
+                showError("เกิดข้อผิดพลาดในการเชื่อมต่อ Discord");
+                console.error(err);
+            });
+        }
+    };
+
+    function showError(msg) {
+        document.getElementById('loading').style.display = 'none';
+        const errDiv = document.getElementById('error-msg');
+        errDiv.innerText = msg;
+        errDiv.style.display = 'block';
+        document.getElementById('btn-login').style.display = 'inline-block'; // ให้ลองใหม่
+    }
+
+    // ==========================================
+    // 2. ส่วนคำนวณเดิม (Original Logic)
+    // ==========================================
     (function(){
-        // ใส่ Link ที่ได้จากการ Deploy ตรงนี้
         const API_URL = "https://script.google.com/macros/s/AKfycbyiwd2Ks5NkKd0IAJLVSs7EE9xo7dNf22DgbfCdQP__Pa4kbEo_pffvFlMjwjAmoikiEg/exec"; 
 
-        // ตัวแปร UI
         const select = document.getElementById('statusSelect');
         const inputs = {
             base: document.getElementById('inp_base'),
@@ -329,7 +315,6 @@
             finalTime: document.getElementById('res_final_time')
         };
         
-        // Config สำหรับโชว์ Stat แนะนำ (ไม่ได้ใช้คำนวณ)
         const configStats = [
             { name: 'Stun',    atk: 'STR', defC: 'VIT+AGI', defT: 'VIT' },
             { name: 'Blind',   atk: 'STR', defC: 'INT+DEX', defT: 'INT' },
@@ -345,7 +330,6 @@
             { name: 'Snare',   atk: 'AGI', defC: 'VIT+STR', defT: 'VIT' }
         ];
 
-        // สร้าง Dropdown
         configStats.forEach(c => {
             const opt = document.createElement('option');
             opt.value = c.name;
@@ -353,7 +337,6 @@
             select.appendChild(opt);
         });
 
-        // ฟังก์ชันอัปเดต Label
         function updateLabels() {
             const data = configStats.find(c => c.name === select.value);
             if(data) {
@@ -363,24 +346,20 @@
             }
         }
 
-        // ฟังก์ชันส่งค่าไปคำนวณ
         let timeout = null;
         function calculate() {
             results.finalTime.innerHTML = '...';
-            
             if(timeout) clearTimeout(timeout);
-            timeout = setTimeout(callServer, 500); // รอ 0.5 วิค่อยส่ง
+            timeout = setTimeout(callServer, 500);
         }
 
         function callServer() {
-            // เตรียมข้อมูลส่ง
             const params = new URLSearchParams();
             params.append('status', select.value);
             for(let key in inputs) {
                 params.append(key, inputs[key].value);
             }
 
-            // ยิงไปที่ Server
             fetch(API_URL + "?" + params.toString())
                 .then(res => res.json())
                 .then(data => {
@@ -394,13 +373,11 @@
                 });
         }
 
-        // ผูก Event
         select.addEventListener('change', () => { updateLabels(); calculate(); });
         Object.values(inputs).forEach(input => {
             input.addEventListener('input', calculate);
         });
 
-        // เริ่มต้นทำงาน
         updateLabels();
         calculate();
 
@@ -409,4 +386,3 @@
 
 </body>
 </html>
-
