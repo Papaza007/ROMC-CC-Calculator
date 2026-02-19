@@ -168,6 +168,7 @@
                 </div>
                 <div class="input-group">
                     <label>ค่า Stat ผู้โจมตี (Stat Value)</label>
+                     <span id="lbl_atk_stat" class="stat-badge" style="background:var(--c-atk)">STR</span>
                     <input type="number" id="inp_atk_stat" value="0">
                 </div>
                 <div class="input-group">
@@ -214,15 +215,15 @@
 
     <div class="result-section">
         <div class="res-box">
-            <h3>Chance</h3>
+            <h3>Chance (โอกาสติด)</h3>
             <div class="res-value v-chance" id="res_chance">0<span class="unit">%</span></div>
         </div>
         <div class="res-box">
-            <h3>Duration</h3>
+            <h3>Duration (เวลาติดเป็น%)</h3>
             <div class="res-value v-duration" id="res_duration_pct">100<span class="unit">%</span></div>
         </div>
         <div class="res-box">
-            <h3>Final Time</h3>
+            <h3>Final Time (เวลาติด วินาที)</h3>
             <div class="res-value v-time" id="res_final_time">0.00<span class="unit">s</span></div>
         </div>
     </div>
@@ -388,6 +389,7 @@
 
 </body>
 </html>
+
 
 
 
